@@ -4,16 +4,10 @@ import model.dao.Serializador;
 import viewer.JanelaPrincipal;
 
 public class CtrlPrograma extends CtrlAbstrato {
-    //
-    // ATRIBUTOS
-    //
     private JanelaPrincipal janela;
-    private CtrlIncluirCard ctrlIncluirCard;
-    private CtrlConsultarCards ctrlConsultarCards;
+    private CtrlIncluirUsuario ctrlIncluirUsuario;
+    private CtrlConsultarUsuarios ctrlConsultarUsuarios;
 
-    //
-    // MÉTODOS
-    //
     public CtrlPrograma() {
         super(null);
         Serializador.recuperarObjetos();
@@ -32,22 +26,22 @@ public class CtrlPrograma extends CtrlAbstrato {
         System.exit(0);
     }
 
-    public void iniciarIncluirCard() {
-        this.ctrlIncluirCard = new CtrlIncluirCard(this);
+    public void iniciarIncluirUsuario() {
+        this.ctrlIncluirUsuario = new CtrlIncluirUsuario(this);
     }
 
-    public void fimIncluirCard() {
-        this.ctrlIncluirCard = null;
-        if (this.ctrlConsultarCards != null)
-            this.ctrlConsultarCards.atualizarDados();
+    public void fimIncluirUsuario() {
+        this.ctrlIncluirUsuario = null;
+        if (this.ctrlConsultarUsuarios != null)
+            this.ctrlConsultarUsuarios.atualizarDados();
     }
 
-    public void iniciarConsultarCards() {
-        this.ctrlConsultarCards = new CtrlConsultarCards(this);
+    public void iniciarConsultarUsuarios() {
+        this.ctrlConsultarUsuarios = new CtrlConsultarUsuarios(this);
     }
 
-    public void fimConsultarCards() {
-        this.ctrlConsultarCards = null;
+    public void fimConsultarUsuarios() {
+        this.ctrlConsultarUsuarios = null;
     }
 
     public static void main(String[] args) {

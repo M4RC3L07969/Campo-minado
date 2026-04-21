@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JOptionPane;
 
-import model.Card;
+import model.Usuario;
 
 public class Serializador {
 
@@ -17,7 +17,7 @@ public class Serializador {
 			FileOutputStream fos = new FileOutputStream("objetos.dat");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-			oos.writeObject(DaoCard.obterTodos());
+			oos.writeObject(DaoUsuario.obterTodos());
 
 			oos.close();
 		} catch (IOException e) {
@@ -30,7 +30,7 @@ public class Serializador {
 			FileInputStream fis = new FileInputStream("objetos.dat");
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
-			DaoCard.recuperarTodos((Card[])ois.readObject());
+			DaoUsuario.recuperarTodos((Usuario[]) ois.readObject());
 
 			ois.close();
 		} catch (IOException e) {

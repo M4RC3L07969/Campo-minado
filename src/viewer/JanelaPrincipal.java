@@ -25,25 +25,25 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JButton btIncluirCard = new JButton("Incluir Carta");
-		btIncluirCard.addActionListener(new ActionListener() {
+		JButton btIncluirUsuario = new JButton("Incluir Usuário");
+		btIncluirUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
-				ctrl.iniciarIncluirCard();
+				ctrl.iniciarIncluirUsuario();
 			}
 		});
-		btIncluirCard.setBounds(30, 40, 150, 30);
-		contentPane.add(btIncluirCard);
+		btIncluirUsuario.setBounds(30, 40, 150, 30);
+		contentPane.add(btIncluirUsuario);
 
-		JButton btConsultarCards = new JButton("Consultar Cartas");
-		btConsultarCards.addActionListener(new ActionListener() {
+		JButton btConsultarUsuarios = new JButton("Consultar Usuários");
+		btConsultarUsuarios.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
-				ctrl.iniciarConsultarCards();
+				ctrl.iniciarConsultarUsuarios();
 			}
 		});
-		btConsultarCards.setBounds(200, 40, 150, 30);
-		contentPane.add(btConsultarCards);
+		btConsultarUsuarios.setBounds(200, 40, 150, 30);
+		contentPane.add(btConsultarUsuarios);
 
 		JButton btSair = new JButton("Sair");
 		btSair.addActionListener(new ActionListener() {

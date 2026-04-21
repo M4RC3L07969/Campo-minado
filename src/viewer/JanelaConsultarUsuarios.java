@@ -8,17 +8,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
-import controller.CtrlConsultarCards;
-import model.Card;
+import controller.CtrlConsultarUsuarios;
+import model.Usuario;
 
-public class JanelaConsultarCards extends JanelaAbstrata {
+public class JanelaConsultarUsuarios extends JanelaAbstrata {
 	private JPanel contentPane;
 	private JTable tabela;
-	private Card[] listaCards;
+	private Usuario[] listaUsuarios;
 
-	public JanelaConsultarCards(CtrlConsultarCards ctrl, Card[] conjCards) {
+	public JanelaConsultarUsuarios(CtrlConsultarUsuarios ctrl, Usuario[] conjUsuarios) {
 		super(ctrl);
-		setTitle("Cartas");
+		setTitle("Usuários");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 600, 350);
 		contentPane = new JPanel();
@@ -26,7 +26,7 @@ public class JanelaConsultarCards extends JanelaAbstrata {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		this.atualizarDados(conjCards);
+		this.atualizarDados(conjUsuarios);
 
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		scrollPane.setBounds(10, 11, 564, 250);
@@ -34,25 +34,25 @@ public class JanelaConsultarCards extends JanelaAbstrata {
 
 		JButton btIncluir = new JButton("Incluir");
 		btIncluir.addActionListener(e -> {
-			CtrlConsultarCards c = (CtrlConsultarCards) getCtrl();
-			c.iniciarIncluirCard();
+			CtrlConsultarUsuarios c = (CtrlConsultarUsuarios) getCtrl();
+			c.iniciarIncluirUsuario();
 		});
 		btIncluir.setBounds(10, 270, 89, 23);
 		contentPane.add(btIncluir);
 
 		JButton btExcluir = new JButton("Excluir");
 		btExcluir.addActionListener(e -> {
-			Card c = obterLinhaSelecionada();
-			if (c != null) {
+			Usuario u = obterLinhaSelecionada();
+			if (u != null) {
 				int confirmacao = JOptionPane.showConfirmDialog(
-						this, "Você tem certeza que deseja deletar a carta " + c.getNome() + "?",
+						this, "Você tem certeza que deseja deletar o usuário " + u.getNome() + "?",
 						"Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
 				if (confirmacao == JOptionPane.YES_OPTION) {
-					CtrlConsultarCards ctrl2 = (CtrlConsultarCards) getCtrl();
-					ctrl2.excluirCard(c);
+					CtrlConsultarUsuarios ctrl2 = (CtrlConsultarUsuarios) getCtrl();
+					ctrl2.excluirUsuario(u);
 				}
 			} else {
-				notificar("Selecione uma carta para exclusão");
+				notificar("Selecione um usuário para exclusão");
 			}
 		});
 		btExcluir.setBounds(120, 270, 89, 23);
@@ -60,12 +60,12 @@ public class JanelaConsultarCards extends JanelaAbstrata {
 
 		JButton btAlterar = new JButton("Alterar");
 		btAlterar.addActionListener(e -> {
-			Card c = obterLinhaSelecionada();
-			if (c != null) {
-				CtrlConsultarCards ctrl2 = (CtrlConsultarCards) getCtrl();
-				ctrl2.iniciarAlterarCard(c);
+			Usuario u = obterLinhaSelecionada();
+			if (u != null) {
+				CtrlConsultarUsuarios ctrl2 = (CtrlConsultarUsuarios) getCtrl();
+				ctrl2.iniciarAlterarUsuario(u);
 			} else {
-				notificar("Selecione uma carta para alteração");
+				notificar("Selecione um usuário para alteração");
 			}
 		});
 		btAlterar.setBounds(230, 270, 89, 23);
@@ -79,21 +79,21 @@ public class JanelaConsultarCards extends JanelaAbstrata {
 		this.setVisible(true);
 	}
 
-	public void atualizarDados(Card[] conjCards) {
-		this.listaCards = conjCards;
-		HelperTableModel h = new HelperTableModel(this.listaCards);
+	public void atualizarDados(Usuario[] conjUsuarios) {
+		this.listaUsuarios = conjUsuarios;
+		HelperTableModel h = new HelperTableModel(this.listaUsuarios);
 		if (this.tabela == null)
 			this.tabela = new JTable(h.getTableModel());
 		else
 			this.tabela.setModel(h.getTableModel());
 	}
 
-	public Card obterLinhaSelecionada() {
-		if (this.listaCards == null || this.listaCards.length == 0)
+	public Usuario obterLinhaSelecionada() {
+		if (this.listaUsuarios == null || this.listaUsuarios.length == 0)
 			return null;
 		int numLinhaSelecionada = this.tabela.getSelectedRow();
-		if (numLinhaSelecionada != -1 && numLinhaSelecionada < this.listaCards.length)
-			return this.listaCards[numLinhaSelecionada];
+		if (numLinhaSelecionada != -1 && numLinhaSelecionada < this.listaUsuarios.length)
+			return this.listaUsuarios[numLinhaSelecionada];
 		return null;
 	}
 }
