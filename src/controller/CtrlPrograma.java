@@ -1,12 +1,11 @@
 package controller;
 
+import model.Usuario;
 import model.dao.Serializador;
 import viewer.JanelaPrincipal;
 
 public class CtrlPrograma extends CtrlAbstrato {
     private JanelaPrincipal janela;
-    private CtrlIncluirUsuario ctrlIncluirUsuario;
-    private CtrlConsultarUsuarios ctrlConsultarUsuarios;
 
     public CtrlPrograma() {
         super(null);
@@ -26,22 +25,16 @@ public class CtrlPrograma extends CtrlAbstrato {
         System.exit(0);
     }
 
-    public void iniciarIncluirUsuario() {
-        this.ctrlIncluirUsuario = new CtrlIncluirUsuario(this);
-    }
-
-    public void fimIncluirUsuario() {
-        this.ctrlIncluirUsuario = null;
-        if (this.ctrlConsultarUsuarios != null)
-            this.ctrlConsultarUsuarios.atualizarDados();
+    public void iniciarLogin() {
+        new CtrlLogin(this);
     }
 
     public void iniciarConsultarUsuarios() {
-        this.ctrlConsultarUsuarios = new CtrlConsultarUsuarios(this);
+        new CtrlConsultarUsuarios(this);
     }
 
-    public void fimConsultarUsuarios() {
-        this.ctrlConsultarUsuarios = null;
+    public void fimLogin(Usuario usuario) {
+        this.janela.atualizarUsuarioLogado(usuario);
     }
 
     public static void main(String[] args) {

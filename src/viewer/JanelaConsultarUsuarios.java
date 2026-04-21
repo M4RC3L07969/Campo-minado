@@ -32,14 +32,6 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 		scrollPane.setBounds(10, 11, 564, 250);
 		contentPane.add(scrollPane);
 
-		JButton btIncluir = new JButton("Incluir");
-		btIncluir.addActionListener(e -> {
-			CtrlConsultarUsuarios c = (CtrlConsultarUsuarios) getCtrl();
-			c.iniciarIncluirUsuario();
-		});
-		btIncluir.setBounds(10, 270, 89, 23);
-		contentPane.add(btIncluir);
-
 		JButton btExcluir = new JButton("Excluir");
 		btExcluir.addActionListener(e -> {
 			Usuario u = obterLinhaSelecionada();
@@ -55,7 +47,7 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 				notificar("Selecione um usuário para exclusão");
 			}
 		});
-		btExcluir.setBounds(120, 270, 89, 23);
+		btExcluir.setBounds(10, 270, 89, 23);
 		contentPane.add(btExcluir);
 
 		JButton btAlterar = new JButton("Alterar");

@@ -10,8 +10,12 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 	private Usuario usuarioCriado;
 
 	public CtrlIncluirUsuario(CtrlAbstrato ctrlPai) {
+		this(ctrlPai, null, null);
+	}
+
+	public CtrlIncluirUsuario(CtrlAbstrato ctrlPai, String nomeInicial, String senhaInicial) {
 		super(ctrlPai);
-		this.janela = new JanelaUsuario(this);
+		this.janela = new JanelaUsuario(this, false, nomeInicial, senhaInicial);
 		this.janela.setVisible(true);
 	}
 
@@ -26,6 +30,12 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 			}
 			this.janela.notificar("Usuário " + nome + " incluído com sucesso!");
 			this.encerrar();
+
+			// Se foi chamado pelo CtrlPrograma (Sign In), já loga o usuário
+			CtrlAbstrato ctrlPai = this.getCtrlPai();
+			if (ctrlPai instanceof CtrlPrograma ctrl) {
+				ctrl.fimLogin(this.usuarioCriado);
+			}
 		} catch (ModelException me) {
 			this.janela.notificar(me.getMessage());
 		}
@@ -33,12 +43,6 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 
 	public void encerrar() {
 		this.janela.setVisible(false);
-		CtrlAbstrato ctrlPai = this.getCtrlPai();
-		if (ctrlPai instanceof CtrlPrograma ctrl) {
-			ctrl.fimIncluirUsuario();
-		} else if (ctrlPai instanceof CtrlConsultarUsuarios ctrl) {
-			ctrl.fimIncluirUsuario();
-		}
 	}
 
 	public Object getBemTangivel() {

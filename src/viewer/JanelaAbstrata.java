@@ -6,15 +6,9 @@ import javax.swing.JOptionPane;
 import controller.CtrlAbstrato;
 
 abstract public class JanelaAbstrata extends JFrame {
-    //
-    // ATRIBUTOS
-    //
 
     final private CtrlAbstrato ctrl;
 
-    //
-    // MÉTODOS
-    //
     public JanelaAbstrata(CtrlAbstrato c) {
         this.ctrl = c;
     }

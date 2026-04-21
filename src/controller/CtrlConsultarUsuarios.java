@@ -6,7 +6,6 @@ import viewer.JanelaConsultarUsuarios;
 
 public class CtrlConsultarUsuarios extends CtrlAbstrato {
 	private JanelaConsultarUsuarios janela;
-	private CtrlIncluirUsuario ctrlIncluirUsuario;
 	private CtrlAlterarUsuario ctrlAlterarUsuario;
 
 	public CtrlConsultarUsuarios(CtrlAbstrato ctrlPai) {
@@ -15,16 +14,6 @@ public class CtrlConsultarUsuarios extends CtrlAbstrato {
 		Usuario[] conjUsuarios = dao.obterTodos();
 		this.janela = new JanelaConsultarUsuarios(this, conjUsuarios);
 		this.janela.setVisible(true);
-	}
-
-	public void iniciarIncluirUsuario() {
-		this.ctrlIncluirUsuario = new CtrlIncluirUsuario(this);
-	}
-
-	public void fimIncluirUsuario() {
-		this.ctrlIncluirUsuario = null;
-		Usuario[] conjUsuarios = new DaoUsuario().obterTodos();
-		this.janela.atualizarDados(conjUsuarios);
 	}
 
 	public void iniciarAlterarUsuario(Usuario u) {
@@ -53,8 +42,6 @@ public class CtrlConsultarUsuarios extends CtrlAbstrato {
 	@Override
 	public void encerrar() {
 		this.janela.setVisible(false);
-		CtrlPrograma ctrl = (CtrlPrograma) getCtrlPai();
-		ctrl.fimConsultarUsuarios();
 	}
 
 	@Override

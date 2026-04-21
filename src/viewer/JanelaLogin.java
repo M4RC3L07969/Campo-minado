@@ -8,29 +8,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.CtrlAbstrato;
-import controller.CtrlIncluirUsuario;
-import controller.CtrlAlterarUsuario;
-import model.Usuario;
+import controller.CtrlLogin;
 
-public class JanelaUsuario extends JanelaAbstrata {
+public class JanelaLogin extends JanelaAbstrata {
 	private JPanel contentPane;
 	private JTextField tfNome;
 	private JPasswordField pfSenha;
 	private boolean senhaVisivel = false;
-	private boolean modoEdicao = false;
 
-	public JanelaUsuario(CtrlAbstrato ctrl) {
-		this(ctrl, false, null, null);
-	}
-
-	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao) {
-		this(ctrl, modoEdicao, null, null);
-	}
-
-	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao, String nomeInicial, String senhaInicial) {
+	public JanelaLogin(CtrlAbstrato ctrl) {
 		super(ctrl);
-		this.modoEdicao = modoEdicao;
-		setTitle("Usuário");
+		setTitle("Login");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 350, 200);
 		contentPane = new JPanel();
@@ -72,29 +60,34 @@ public class JanelaUsuario extends JanelaAbstrata {
 		});
 		contentPane.add(btOlho);
 
-		if (modoEdicao) {
-			lblSenha.setVisible(false);
-			pfSenha.setVisible(false);
-			btOlho.setVisible(false);
-		}
-
-		JButton btOk = new JButton("Ok");
-		btOk.addActionListener(new ActionListener() {
+		JButton btLogin = new JButton("Login");
+		btLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = tfNome.getText();
-				String senha = modoEdicao ? null : new String(pfSenha.getPassword());
+				String senha = new String(pfSenha.getPassword());
 
-				if (getCtrl() instanceof CtrlIncluirUsuario ctrl) {
-					ctrl.incluirUsuario(nome, senha);
-				} else if (getCtrl() instanceof CtrlAlterarUsuario ctrl) {
-					ctrl.alterarUsuario(nome, senha);
+				if (getCtrl() instanceof CtrlLogin ctrl) {
+					ctrl.fazerLogin(nome, senha);
 				} else {
-					JOptionPane.showMessageDialog(btOk, "Controlador inválido.");
+					JOptionPane.showMessageDialog(btLogin, "Controlador inválido.");
 				}
 			}
 		});
-		btOk.setBounds(70, 110, 89, 23);
-		contentPane.add(btOk);
+		btLogin.setBounds(70, 110, 89, 23);
+		contentPane.add(btLogin);
+
+		JButton btCriarConta = new JButton("Criar Conta");
+		btCriarConta.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String nome = tfNome.getText();
+				String senha = new String(pfSenha.getPassword());
+				if (getCtrl() instanceof CtrlLogin ctrl) {
+					ctrl.criarConta(nome, senha);
+				}
+			}
+		});
+		btCriarConta.setBounds(180, 110, 120, 23);
+		contentPane.add(btCriarConta);
 
 		JButton btCancelar = new JButton("Cancelar");
 		btCancelar.addActionListener(new ActionListener() {
@@ -102,20 +95,7 @@ public class JanelaUsuario extends JanelaAbstrata {
 				setVisible(false);
 			}
 		});
-		btCancelar.setBounds(180, 110, 89, 23);
+		btCancelar.setBounds(125, 145, 100, 23);
 		contentPane.add(btCancelar);
-
-		// Pre-fill fields if initial values are provided
-		if (nomeInicial != null) {
-			tfNome.setText(nomeInicial);
-		}
-		if (senhaInicial != null) {
-			pfSenha.setText(senhaInicial);
-		}
-	}
-
-	public void preencherCampos(Usuario u) {
-		tfNome.setText(u.getNome());
-		pfSenha.setText("");
 	}
 }
