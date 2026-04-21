@@ -75,6 +75,14 @@ public class DaoUsuario {
         return null;
     }
 
+    public Usuario obterUsuarioPeloId(int id) {
+        for (int i = 0; i < DaoUsuario.numElementos; i++) {
+            if (DaoUsuario.arrayDeElementos[i].getId() == id)
+                return DaoUsuario.arrayDeElementos[i];
+        }
+        return null;
+    }
+
     public static Usuario[] obterTodos() {
         Usuario[] resultado = new Usuario[numElementos];
         for (int i = 0; i < numElementos; i++)

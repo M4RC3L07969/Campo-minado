@@ -2,6 +2,7 @@ package controller;
 
 import model.Usuario;
 import model.dao.DaoUsuario;
+import model.dao.DaoPartida;
 import viewer.JanelaConsultarUsuarios;
 
 public class CtrlConsultarUsuarios extends CtrlAbstrato {
@@ -27,11 +28,13 @@ public class CtrlConsultarUsuarios extends CtrlAbstrato {
 	}
 
 	public void excluirUsuario(Usuario u) {
+		DaoPartida daoPartida = new DaoPartida();
+		daoPartida.removerPartidasPorUsuario(u);
 		DaoUsuario dao = new DaoUsuario();
 		dao.remover(u);
 		Usuario[] conjUsuarios = dao.obterTodos();
 		this.janela.atualizarDados(conjUsuarios);
-		this.janela.notificar("Usuário excluído com sucesso!");
+		this.janela.notificar("Usuário e suas partidas excluídos com sucesso!");
 	}
 
 	public void atualizarDados() {

@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.JOptionPane;
 
 import model.Usuario;
+import model.Partida;
 
 public class Serializador {
 
@@ -18,6 +19,7 @@ public class Serializador {
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 
 			oos.writeObject(DaoUsuario.obterTodos());
+			oos.writeObject(DaoPartida.obterTodos());
 
 			oos.close();
 		} catch (IOException e) {
@@ -31,6 +33,7 @@ public class Serializador {
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			DaoUsuario.recuperarTodos((Usuario[]) ois.readObject());
+			DaoPartida.recuperarTodos((Partida[]) ois.readObject());
 
 			ois.close();
 		} catch (IOException e) {

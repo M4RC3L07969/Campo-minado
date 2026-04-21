@@ -37,7 +37,9 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 			Usuario u = obterLinhaSelecionada();
 			if (u != null) {
 				int confirmacao = JOptionPane.showConfirmDialog(
-						this, "Você tem certeza que deseja deletar o usuário " + u.getNome() + "?",
+						this,
+						"Você tem certeza que deseja deletar o usuário " + u.getNome()
+								+ "?\nTodas as partidas relacionadas a este usuário também serão excluídas.",
 						"Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
 				if (confirmacao == JOptionPane.YES_OPTION) {
 					CtrlConsultarUsuarios ctrl2 = (CtrlConsultarUsuarios) getCtrl();

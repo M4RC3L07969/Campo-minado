@@ -63,13 +63,32 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		btConsultarUsuarios.setBounds(115, 85, 150, 30);
 		contentPane.add(btConsultarUsuarios);
 
+		JButton btIncluirPartida = new JButton("Incluir Partida");
+		btIncluirPartida.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new controller.CtrlIncluirPartida(getCtrl());
+			}
+		});
+		btIncluirPartida.setBounds(115, 120, 150, 30);
+		contentPane.add(btIncluirPartida);
+
+		JButton btConsultarPartidas = new JButton("Consultar Partidas");
+		btConsultarPartidas.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
+				ctrl.iniciarConsultarPartidas();
+			}
+		});
+		btConsultarPartidas.setBounds(115, 155, 150, 30);
+		contentPane.add(btConsultarPartidas);
+
 		JButton btSair = new JButton("Sair");
 		btSair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getCtrl().encerrar();
 			}
 		});
-		btSair.setBounds(130, 155, 120, 30);
+		btSair.setBounds(130, 190, 120, 30);
 		contentPane.add(btSair);
 	}
 
