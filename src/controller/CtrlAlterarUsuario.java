@@ -17,7 +17,7 @@ public class CtrlAlterarUsuario extends CtrlAbstrato {
 		this.janela.setVisible(true);
 	}
 
-	public void alterarUsuario(String novoNome, String novaSenha) {
+	public void alterarUsuario(String novoNome, String novoLogin, String novaSenha) {
 		try {
 			DaoUsuario dao = new DaoUsuario();
 			Usuario existente = dao.obterUsuarioPeloNome(novoNome);
@@ -25,7 +25,13 @@ public class CtrlAlterarUsuario extends CtrlAbstrato {
 				this.janela.notificar("Já existe um usuário com o nome " + novoNome + "!");
 				return;
 			}
+			existente = dao.obterUsuarioPeloLogin(novoLogin);
+			if (existente != null && existente != this.usuarioSelecionado) {
+				this.janela.notificar("Já existe um usuário com o login " + novoLogin + "!");
+				return;
+			}
 			this.usuarioSelecionado.setNome(novoNome);
+			this.usuarioSelecionado.setLogin(novoLogin);
 			if (novaSenha != null && !novaSenha.isEmpty()) {
 				this.usuarioSelecionado.setSenha(novaSenha);
 			}

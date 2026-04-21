@@ -15,24 +15,26 @@ import model.Usuario;
 public class JanelaUsuario extends JanelaAbstrata {
 	private JPanel contentPane;
 	private JTextField tfNome;
+	private JTextField tfLogin;
 	private JPasswordField pfSenha;
 	private boolean senhaVisivel = false;
 	private boolean modoEdicao = false;
 
 	public JanelaUsuario(CtrlAbstrato ctrl) {
-		this(ctrl, false, null, null);
+		this(ctrl, false, null, null, null);
 	}
 
 	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao) {
-		this(ctrl, modoEdicao, null, null);
+		this(ctrl, modoEdicao, null, null, null);
 	}
 
-	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao, String nomeInicial, String senhaInicial) {
+	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao, String nomeInicial, String loginInicial,
+			String senhaInicial) {
 		super(ctrl);
 		this.modoEdicao = modoEdicao;
 		setTitle("Usuário");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 350, 200);
+		setBounds(100, 100, 350, 250);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -48,18 +50,28 @@ public class JanelaUsuario extends JanelaAbstrata {
 		contentPane.add(tfNome);
 		tfNome.setColumns(10);
 
+		JLabel lblLogin = new JLabel("Login:");
+		lblLogin.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblLogin.setBounds(33, 60, 60, 14);
+		contentPane.add(lblLogin);
+
+		tfLogin = new JTextField();
+		tfLogin.setBounds(100, 55, 200, 20);
+		contentPane.add(tfLogin);
+		tfLogin.setColumns(10);
+
 		JLabel lblSenha = new JLabel("Senha:");
 		lblSenha.setFont(new Font("Calibri", Font.PLAIN, 14));
-		lblSenha.setBounds(33, 65, 60, 14);
+		lblSenha.setBounds(33, 95, 60, 14);
 		contentPane.add(lblSenha);
 
 		pfSenha = new JPasswordField();
-		pfSenha.setBounds(100, 60, 170, 20);
+		pfSenha.setBounds(100, 90, 170, 20);
 		contentPane.add(pfSenha);
 
 		JButton btOlho = new JButton("👁");
 		btOlho.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
-		btOlho.setBounds(275, 60, 30, 20);
+		btOlho.setBounds(275, 90, 30, 20);
 		btOlho.addActionListener(e -> {
 			senhaVisivel = !senhaVisivel;
 			if (senhaVisivel) {
@@ -82,18 +94,19 @@ public class JanelaUsuario extends JanelaAbstrata {
 		btOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = tfNome.getText();
+				String login = tfLogin.getText();
 				String senha = modoEdicao ? null : new String(pfSenha.getPassword());
 
 				if (getCtrl() instanceof CtrlIncluirUsuario ctrl) {
-					ctrl.incluirUsuario(nome, senha);
+					ctrl.incluirUsuario(nome, login, senha);
 				} else if (getCtrl() instanceof CtrlAlterarUsuario ctrl) {
-					ctrl.alterarUsuario(nome, senha);
+					ctrl.alterarUsuario(nome, login, senha);
 				} else {
 					JOptionPane.showMessageDialog(btOk, "Controlador inválido.");
 				}
 			}
 		});
-		btOk.setBounds(70, 110, 89, 23);
+		btOk.setBounds(70, 140, 89, 23);
 		contentPane.add(btOk);
 
 		JButton btCancelar = new JButton("Cancelar");
@@ -102,12 +115,15 @@ public class JanelaUsuario extends JanelaAbstrata {
 				setVisible(false);
 			}
 		});
-		btCancelar.setBounds(180, 110, 89, 23);
+		btCancelar.setBounds(180, 140, 89, 23);
 		contentPane.add(btCancelar);
 
 		// Pre-fill fields if initial values are provided
 		if (nomeInicial != null) {
 			tfNome.setText(nomeInicial);
+		}
+		if (loginInicial != null) {
+			tfLogin.setText(loginInicial);
 		}
 		if (senhaInicial != null) {
 			pfSenha.setText(senhaInicial);
@@ -116,6 +132,7 @@ public class JanelaUsuario extends JanelaAbstrata {
 
 	public void preencherCampos(Usuario u) {
 		tfNome.setText(u.getNome());
+		tfLogin.setText(u.getLogin());
 		pfSenha.setText("");
 	}
 }

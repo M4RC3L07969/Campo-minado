@@ -20,15 +20,15 @@ public class JanelaLogin extends JanelaAbstrata {
 		super(ctrl);
 		setTitle("Login");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 350, 200);
+		setBounds(100, 100, 400, 200);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblNome = new JLabel("Nome:");
+		JLabel lblNome = new JLabel("Nome ou Login:");
 		lblNome.setFont(new Font("Calibri", Font.PLAIN, 14));
-		lblNome.setBounds(33, 30, 60, 14);
+		lblNome.setBounds(33, 30, 120, 14);
 		contentPane.add(lblNome);
 
 		tfNome = new JTextField();

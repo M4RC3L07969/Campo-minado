@@ -19,6 +19,8 @@ public class DaoUsuario {
             return false;
         if (obterUsuarioPeloNome(novo.getNome()) != null)
             return false;
+        if (obterUsuarioPeloLogin(novo.getLogin()) != null)
+            return false;
         int tamanho = DaoUsuario.arrayDeElementos.length;
         if (DaoUsuario.numElementos == tamanho) {
             Usuario[] novoArray = new Usuario[tamanho + FATOR_CRESCIMENTO];
@@ -59,6 +61,15 @@ public class DaoUsuario {
         for (int i = 0; i < DaoUsuario.numElementos; i++) {
             String nomeDoUsuario = DaoUsuario.arrayDeElementos[i].getNome();
             if (nomeDoUsuario.equals(nome))
+                return DaoUsuario.arrayDeElementos[i];
+        }
+        return null;
+    }
+
+    public Usuario obterUsuarioPeloLogin(String login) {
+        for (int i = 0; i < DaoUsuario.numElementos; i++) {
+            String loginDoUsuario = DaoUsuario.arrayDeElementos[i].getLogin();
+            if (loginDoUsuario.equals(login))
                 return DaoUsuario.arrayDeElementos[i];
         }
         return null;

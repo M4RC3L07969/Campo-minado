@@ -14,10 +14,14 @@ public class CtrlLogin extends CtrlAbstrato {
 		this.janela.setVisible(true);
 	}
 
-	public void fazerLogin(String nome, String senha) {
+	public void fazerLogin(String identificador, String senha) {
 		try {
 			DaoUsuario dao = new DaoUsuario();
-			Usuario usuario = dao.obterUsuarioPeloNome(nome);
+			Usuario usuario = dao.obterUsuarioPeloNome(identificador);
+
+			if (usuario == null) {
+				usuario = dao.obterUsuarioPeloLogin(identificador);
+			}
 
 			if (usuario == null) {
 				this.janela.notificar("Usuário não encontrado!");
@@ -42,14 +46,17 @@ public class CtrlLogin extends CtrlAbstrato {
 	}
 
 	public void criarConta(String nome, String senha) {
-		new CtrlIncluirUsuario(this, nome, senha);
+		new CtrlIncluirUsuario(this, this, nome, senha);
 	}
 
 	public void encerrar() {
 		this.janela.setVisible(false);
-		CtrlAbstrato ctrlPai = this.getCtrlPai();
-		if (ctrlPai instanceof CtrlPrograma ctrl) {
-			ctrl.fimLogin(this.usuarioLogado);
+		// Só chama fimLogin se houver um usuário logado (não foi criado conta nova)
+		if (this.usuarioLogado != null) {
+			CtrlAbstrato ctrlPai = this.getCtrlPai();
+			if (ctrlPai instanceof CtrlPrograma ctrl) {
+				ctrl.fimLogin(this.usuarioLogado);
+			}
 		}
 	}
 
