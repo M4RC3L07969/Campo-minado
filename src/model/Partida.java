@@ -42,6 +42,21 @@ public class Partida implements Serializable {
         return modo;
     }
 
+    public String getModoFormatado() {
+        if (modo == null)
+            return "";
+        switch (modo) {
+            case "8x8":
+                return "Fácil (8x8)";
+            case "12x12":
+                return "Médio (12x12)";
+            case "16x16":
+                return "Difícil (16x16)";
+            default:
+                return modo;
+        }
+    }
+
     public void setModo(String modo) {
         this.modo = modo;
     }
@@ -56,6 +71,19 @@ public class Partida implements Serializable {
 
     public String getResultado() {
         return resultado;
+    }
+
+    public String getResultadoFormatado() {
+        if (resultado == null)
+            return "";
+        switch (resultado) {
+            case "Vitoria":
+                return "Vitória";
+            case "Derrota":
+                return "Derrota";
+            default:
+                return resultado;
+        }
     }
 
     public void setResultado(String resultado) {

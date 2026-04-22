@@ -1,17 +1,35 @@
 package model.dao;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Properties;
+
 import model.Usuario;
+import model.ModelException;
 
 public class DaoUsuario {
 
-    final public static int TAM_INICIAL_ELEMENTOS = 5;
-    final public static int FATOR_CRESCIMENTO = 3;
-
-    private static int numElementos = 0;
-    private static Usuario[] arrayDeElementos = new Usuario[TAM_INICIAL_ELEMENTOS];
-
     public DaoUsuario() {
         super();
+    }
+
+    private Connection getConnection() throws SQLException, FileNotFoundException, IOException {
+        Properties props = new Properties();
+        FileInputStream arquivo = new FileInputStream("db.properties");
+        props.load(arquivo);
+
+        String url = props.getProperty("db.url");
+        String usuario = props.getProperty("db.usuario");
+        String senha = props.getProperty("db.senha");
+
+        return DriverManager.getConnection(url, usuario, senha);
     }
 
     public boolean incluir(Usuario novo) {
@@ -21,79 +39,244 @@ public class DaoUsuario {
             return false;
         if (obterUsuarioPeloLogin(novo.getLogin()) != null)
             return false;
-        int tamanho = DaoUsuario.arrayDeElementos.length;
-        if (DaoUsuario.numElementos == tamanho) {
-            Usuario[] novoArray = new Usuario[tamanho + FATOR_CRESCIMENTO];
-            for (int i = 0; i < tamanho; i++)
-                novoArray[i] = DaoUsuario.arrayDeElementos[i];
-            DaoUsuario.arrayDeElementos = novoArray;
+
+        String sql = "INSERT INTO usuario (nome, login, senha_hash, total_partidas, vitorias, derrotas, melhor_tempo_facil, melhor_tempo_medio, melhor_tempo_dificil) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            operacao.setString(1, novo.getNome());
+            operacao.setString(2, novo.getLogin());
+            operacao.setString(3, novo.getSenhaHash());
+            operacao.setInt(4, novo.getTotalPartidas());
+            operacao.setInt(5, novo.getVitorias());
+            operacao.setInt(6, novo.getDerrotas());
+            operacao.setInt(7, novo.getMelhorTempoFacil());
+            operacao.setInt(8, novo.getMelhorTempoMedio());
+            operacao.setInt(9, novo.getMelhorTempoDificil());
+            operacao.execute();
+
+            ResultSet rs = operacao.getGeneratedKeys();
+            if (rs.next()) {
+                novo.setId(rs.getInt(1));
+            }
+
+            conexao.close();
+            operacao.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao incluir usuario: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
         }
-        DaoUsuario.arrayDeElementos[DaoUsuario.numElementos] = novo;
-        DaoUsuario.numElementos++;
-        return true;
     }
 
     public boolean remover(Usuario ex) {
-        int pos;
-        for (pos = 0; pos < DaoUsuario.numElementos; pos++)
-            if (DaoUsuario.arrayDeElementos[pos] == ex)
-                break;
-        if (pos == DaoUsuario.numElementos)
+        if (ex == null || ex.getId() == 0)
             return false;
-        for (int i = pos; i < DaoUsuario.numElementos - 1; i++)
-            DaoUsuario.arrayDeElementos[i] = DaoUsuario.arrayDeElementos[i + 1];
-        DaoUsuario.arrayDeElementos[DaoUsuario.numElementos - 1] = null;
-        DaoUsuario.numElementos--;
-        return true;
+
+        String sql = "DELETE FROM usuario WHERE id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setInt(1, ex.getId());
+            int linhasAfetadas = operacao.executeUpdate();
+
+            conexao.close();
+            operacao.close();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao remover usuario: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean alterar(Usuario alterado) {
-        if (alterado == null)
+        if (alterado == null || alterado.getId() == 0)
             return false;
-        for (int i = 0; i < DaoUsuario.numElementos; i++) {
-            if (DaoUsuario.arrayDeElementos[i] == alterado)
-                return true;
+
+        String sql = "UPDATE usuario SET nome = ?, login = ?, senha_hash = ?, total_partidas = ?, vitorias = ?, derrotas = ?, melhor_tempo_facil = ?, melhor_tempo_medio = ?, melhor_tempo_dificil = ? WHERE id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setString(1, alterado.getNome());
+            operacao.setString(2, alterado.getLogin());
+            operacao.setString(3, alterado.getSenhaHash());
+            operacao.setInt(4, alterado.getTotalPartidas());
+            operacao.setInt(5, alterado.getVitorias());
+            operacao.setInt(6, alterado.getDerrotas());
+            operacao.setInt(7, alterado.getMelhorTempoFacil());
+            operacao.setInt(8, alterado.getMelhorTempoMedio());
+            operacao.setInt(9, alterado.getMelhorTempoDificil());
+            operacao.setInt(10, alterado.getId());
+            int linhasAfetadas = operacao.executeUpdate();
+
+            conexao.close();
+            operacao.close();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao alterar usuario: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
     public Usuario obterUsuarioPeloNome(String nome) {
-        for (int i = 0; i < DaoUsuario.numElementos; i++) {
-            String nomeDoUsuario = DaoUsuario.arrayDeElementos[i].getNome();
-            if (nomeDoUsuario.equals(nome))
-                return DaoUsuario.arrayDeElementos[i];
+        String sql = "SELECT * FROM usuario WHERE nome = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setString(1, nome);
+            ResultSet resultado = operacao.executeQuery();
+
+            Usuario usuario = null;
+            if (resultado.next()) {
+                usuario = criarUsuarioDoResultSet(resultado);
+            }
+
+            conexao.close();
+            operacao.close();
+            return usuario;
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar usuario: " + e.getMessage());
+            return null;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public Usuario obterUsuarioPeloLogin(String login) {
-        for (int i = 0; i < DaoUsuario.numElementos; i++) {
-            String loginDoUsuario = DaoUsuario.arrayDeElementos[i].getLogin();
-            if (loginDoUsuario.equals(login))
-                return DaoUsuario.arrayDeElementos[i];
+        String sql = "SELECT * FROM usuario WHERE login = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setString(1, login);
+            ResultSet resultado = operacao.executeQuery();
+
+            Usuario usuario = null;
+            if (resultado.next()) {
+                usuario = criarUsuarioDoResultSet(resultado);
+            }
+
+            conexao.close();
+            operacao.close();
+            return usuario;
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar usuario: " + e.getMessage());
+            return null;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public Usuario obterUsuarioPeloId(int id) {
-        for (int i = 0; i < DaoUsuario.numElementos; i++) {
-            if (DaoUsuario.arrayDeElementos[i].getId() == id)
-                return DaoUsuario.arrayDeElementos[i];
+        String sql = "SELECT * FROM usuario WHERE id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setInt(1, id);
+            ResultSet resultado = operacao.executeQuery();
+
+            Usuario usuario = null;
+            if (resultado.next()) {
+                usuario = criarUsuarioDoResultSet(resultado);
+            }
+
+            conexao.close();
+            operacao.close();
+            return usuario;
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar usuario: " + e.getMessage());
+            return null;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public static Usuario[] obterTodos() {
-        Usuario[] resultado = new Usuario[numElementos];
-        for (int i = 0; i < numElementos; i++)
-            resultado[i] = arrayDeElementos[i];
-        return resultado;
+        String sql = "SELECT * FROM usuario";
+
+        try {
+            Properties props = new Properties();
+            FileInputStream arquivo = new FileInputStream("db.properties");
+            props.load(arquivo);
+
+            String url = props.getProperty("db.url");
+            String usuario = props.getProperty("db.usuario");
+            String senha = props.getProperty("db.senha");
+
+            Connection conexao = DriverManager.getConnection(url, usuario, senha);
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            ResultSet resultado = operacao.executeQuery();
+
+            ArrayList<Usuario> lista = new ArrayList<>();
+            while (resultado.next()) {
+                lista.add(criarUsuarioDoResultSet(resultado));
+            }
+
+            conexao.close();
+            operacao.close();
+            return lista.toArray(new Usuario[0]);
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar usuarios: " + e.getMessage());
+            return new Usuario[0];
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return new Usuario[0];
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return new Usuario[0];
+        }
     }
 
-    static void recuperarTodos(Usuario[] array) {
-        DaoUsuario.arrayDeElementos = array;
-        for (numElementos = 0; numElementos < array.length; numElementos++)
-            if (array[numElementos] == null)
-                break;
+    private static Usuario criarUsuarioDoResultSet(ResultSet resultado) throws SQLException {
+        Usuario usuario = new Usuario();
+        usuario.setId(resultado.getInt("id"));
+        try {
+            usuario.setNome(resultado.getString("nome"));
+            usuario.setLogin(resultado.getString("login"));
+        } catch (ModelException e) {
+        }
+        usuario.setSenhaHash(resultado.getString("senha_hash"));
+        usuario.setTotalPartidas(resultado.getInt("total_partidas"));
+        usuario.setVitorias(resultado.getInt("vitorias"));
+        usuario.setDerrotas(resultado.getInt("derrotas"));
+        usuario.setMelhorTempoFacil(resultado.getInt("melhor_tempo_facil"));
+        usuario.setMelhorTempoMedio(resultado.getInt("melhor_tempo_medio"));
+        usuario.setMelhorTempoDificil(resultado.getInt("melhor_tempo_dificil"));
+        return usuario;
     }
 }

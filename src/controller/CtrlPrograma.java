@@ -1,7 +1,6 @@
 package controller;
 
 import model.Usuario;
-import model.dao.Serializador;
 import viewer.JanelaPrincipal;
 
 public class CtrlPrograma extends CtrlAbstrato {
@@ -11,7 +10,6 @@ public class CtrlPrograma extends CtrlAbstrato {
 
     public CtrlPrograma() {
         super(null);
-        Serializador.recuperarObjetos();
         this.janela = new JanelaPrincipal(this);
         this.janela.setVisible(true);
     }
@@ -23,7 +21,6 @@ public class CtrlPrograma extends CtrlAbstrato {
     public void encerrar() {
         this.janela.notificar("Encerrando a execução do sistema");
         this.janela.setVisible(false);
-        Serializador.salvarObjetos();
         System.exit(0);
     }
 

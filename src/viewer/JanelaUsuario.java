@@ -118,7 +118,6 @@ public class JanelaUsuario extends JanelaAbstrata {
 		btCancelar.setBounds(180, 140, 89, 23);
 		contentPane.add(btCancelar);
 
-		// Pre-fill fields if initial values are provided
 		if (nomeInicial != null) {
 			tfNome.setText(nomeInicial);
 		}

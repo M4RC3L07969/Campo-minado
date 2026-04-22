@@ -46,13 +46,11 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 			this.janela.notificar("Usuário " + nome + " incluído com sucesso!");
 			this.encerrar();
 
-			// Se foi chamado pelo CtrlPrograma (Sign In), já loga o usuário
 			CtrlAbstrato ctrlPai = this.getCtrlPai();
 			if (ctrlPai instanceof CtrlPrograma ctrl) {
 				ctrl.fimLogin(this.usuarioCriado);
 			}
 
-			// Fechar tela de login se existir (após logar)
 			if (this.ctrlLogin != null) {
 				this.ctrlLogin.encerrar();
 			}

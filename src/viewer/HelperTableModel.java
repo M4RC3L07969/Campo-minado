@@ -22,7 +22,7 @@ public class HelperTableModel {
 		Class classe = objetos[0].getClass();
 		for (Method m : classe.getMethods()) {
 			String nomeMetodo = m.getName();
-			if (nomeMetodo.startsWith("get") && !nomeMetodo.equals("getClass"))
+			if (nomeMetodo.startsWith("get") && !nomeMetodo.equals("getClass") && !nomeMetodo.contains("Formatado"))
 				listaAtributos.add(nomeMetodo.substring(3));
 		}
 		tabela = new Object[objetos.length][listaAtributos.size()];
@@ -31,8 +31,23 @@ public class HelperTableModel {
 				continue;
 			for (int j = 0; j < listaAtributos.size(); j++) {
 				try {
-					Method get = classe.getMethod("get" + listaAtributos.get(j));
-					Object valor = get.invoke(objetos[i]);
+					String atributo = listaAtributos.get(j);
+					Method get = classe.getMethod("get" + atributo);
+
+					// Tenta usar método formatado se disponível
+					Method getFormatado = null;
+					try {
+						getFormatado = classe.getMethod("get" + atributo + "Formatado");
+					} catch (NoSuchMethodException e) {
+						// Método formatado não existe, usa o padrão
+					}
+
+					Object valor;
+					if (getFormatado != null) {
+						valor = getFormatado.invoke(objetos[i]);
+					} else {
+						valor = get.invoke(objetos[i]);
+					}
 					tabela[i][j] = valor;
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();

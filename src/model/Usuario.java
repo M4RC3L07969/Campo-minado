@@ -26,6 +26,15 @@ public class Usuario implements Serializable {
 	private int melhorTempoMedio;
 	private int melhorTempoDificil;
 
+	public Usuario() {
+		this.totalPartidas = 0;
+		this.vitorias = 0;
+		this.derrotas = 0;
+		this.melhorTempoFacil = 0;
+		this.melhorTempoMedio = 0;
+		this.melhorTempoDificil = 0;
+	}
+
 	public Usuario(String nome, String login, String senha) throws ModelException {
 		this.setNome(nome);
 		this.setLogin(login);

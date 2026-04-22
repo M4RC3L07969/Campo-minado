@@ -1,15 +1,9 @@
 package controller;
 
 abstract public class CtrlAbstrato {
-    //
-    // ATRIBUTO
-    //
 
     final private CtrlAbstrato ctrlPai;
 
-    //
-    // MÉTODOS
-    //
     public CtrlAbstrato(CtrlAbstrato pai) {
         this.ctrlPai = pai;
     }

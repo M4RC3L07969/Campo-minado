@@ -1,81 +1,233 @@
 package model.dao;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Properties;
+
 import model.Partida;
+import model.Usuario;
 
 public class DaoPartida {
-
-    final public static int TAM_INICIAL_ELEMENTOS = 5;
-    final public static int FATOR_CRESCIMENTO = 3;
-
-    private static int numElementos = 0;
-    private static Partida[] arrayDeElementos = new Partida[TAM_INICIAL_ELEMENTOS];
 
     public DaoPartida() {
         super();
     }
 
+    private Connection getConnection() throws SQLException, FileNotFoundException, IOException {
+        Properties props = new Properties();
+        FileInputStream arquivo = new FileInputStream("db.properties");
+        props.load(arquivo);
+
+        String url = props.getProperty("db.url");
+        String usuario = props.getProperty("db.usuario");
+        String senha = props.getProperty("db.senha");
+
+        return DriverManager.getConnection(url, usuario, senha);
+    }
+
     public boolean incluir(Partida novo) {
         if (novo == null)
             return false;
-        int tamanho = DaoPartida.arrayDeElementos.length;
-        if (DaoPartida.numElementos == tamanho) {
-            Partida[] novoArray = new Partida[tamanho + FATOR_CRESCIMENTO];
-            for (int i = 0; i < tamanho; i++)
-                novoArray[i] = DaoPartida.arrayDeElementos[i];
-            DaoPartida.arrayDeElementos = novoArray;
+
+        String sql = "INSERT INTO partida (usuario_id, modo, tempo, resultado, data_partida) VALUES (?, ?, ?, ?, ?)";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+
+            int usuarioId = novo.getUsuario() != null ? novo.getUsuario().getId() : 0;
+            operacao.setInt(1, usuarioId);
+            operacao.setString(2, novo.getModo());
+            operacao.setInt(3, novo.getTempo());
+            operacao.setString(4, novo.getResultado());
+
+            Date dataSql = null;
+            if (novo.getDataPartida() != null && !novo.getDataPartida().isEmpty()) {
+                dataSql = Date.valueOf(novo.getDataPartida());
+            }
+            operacao.setDate(5, dataSql);
+
+            operacao.execute();
+
+            ResultSet rs = operacao.getGeneratedKeys();
+            if (rs.next()) {
+                novo.setId(rs.getInt(1));
+            }
+
+            conexao.close();
+            operacao.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao incluir partida: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao converter data: " + e.getMessage());
+            return false;
         }
-        DaoPartida.arrayDeElementos[DaoPartida.numElementos] = novo;
-        DaoPartida.numElementos++;
-        return true;
     }
 
     public boolean remover(Partida ex) {
-        int pos;
-        for (pos = 0; pos < DaoPartida.numElementos; pos++)
-            if (DaoPartida.arrayDeElementos[pos] == ex)
-                break;
-        if (pos == DaoPartida.numElementos)
+        if (ex == null || ex.getId() == 0)
             return false;
-        for (int i = pos; i < DaoPartida.numElementos - 1; i++)
-            DaoPartida.arrayDeElementos[i] = DaoPartida.arrayDeElementos[i + 1];
-        DaoPartida.arrayDeElementos[DaoPartida.numElementos - 1] = null;
-        DaoPartida.numElementos--;
-        return true;
+
+        String sql = "DELETE FROM partida WHERE id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setInt(1, ex.getId());
+            int linhasAfetadas = operacao.executeUpdate();
+
+            conexao.close();
+            operacao.close();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao remover partida: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean alterar(Partida alterado) {
-        if (alterado == null)
+        if (alterado == null || alterado.getId() == 0)
             return false;
-        for (int i = 0; i < DaoPartida.numElementos; i++) {
-            if (DaoPartida.arrayDeElementos[i] == alterado)
-                return true;
+
+        String sql = "UPDATE partida SET usuario_id = ?, modo = ?, tempo = ?, resultado = ?, data_partida = ? WHERE id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+
+            int usuarioId = alterado.getUsuario() != null ? alterado.getUsuario().getId() : 0;
+            operacao.setInt(1, usuarioId);
+            operacao.setString(2, alterado.getModo());
+            operacao.setInt(3, alterado.getTempo());
+            operacao.setString(4, alterado.getResultado());
+
+            Date dataSql = null;
+            if (alterado.getDataPartida() != null && !alterado.getDataPartida().isEmpty()) {
+                dataSql = Date.valueOf(alterado.getDataPartida());
+            }
+            operacao.setDate(5, dataSql);
+            operacao.setInt(6, alterado.getId());
+
+            int linhasAfetadas = operacao.executeUpdate();
+
+            conexao.close();
+            operacao.close();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao alterar partida: " + e.getMessage());
+            return false;
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao converter data: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    public void removerPartidasPorUsuario(model.Usuario usuario) {
-        for (int i = DaoPartida.numElementos - 1; i >= 0; i--) {
-            Partida partida = DaoPartida.arrayDeElementos[i];
-            if (partida != null && partida.getUsuario() == usuario) {
-                for (int j = i; j < DaoPartida.numElementos - 1; j++)
-                    DaoPartida.arrayDeElementos[j] = DaoPartida.arrayDeElementos[j + 1];
-                DaoPartida.arrayDeElementos[DaoPartida.numElementos - 1] = null;
-                DaoPartida.numElementos--;
-            }
+    public void removerPartidasPorUsuario(Usuario usuario) {
+        if (usuario == null || usuario.getId() == 0)
+            return;
+
+        String sql = "DELETE FROM partida WHERE usuario_id = ?";
+
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            operacao.setInt(1, usuario.getId());
+            operacao.executeUpdate();
+
+            conexao.close();
+            operacao.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao remover partidas do usuario: " + e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
     public static Partida[] obterTodos() {
-        Partida[] resultado = new Partida[numElementos];
-        for (int i = 0; i < numElementos; i++)
-            resultado[i] = arrayDeElementos[i];
-        return resultado;
+        String sql = "SELECT * FROM partida";
+
+        try {
+            Properties props = new Properties();
+            FileInputStream arquivo = new FileInputStream("db.properties");
+            props.load(arquivo);
+
+            String url = props.getProperty("db.url");
+            String usuario = props.getProperty("db.usuario");
+            String senha = props.getProperty("db.senha");
+
+            Connection conexao = DriverManager.getConnection(url, usuario, senha);
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+            ResultSet resultado = operacao.executeQuery();
+
+            ArrayList<Partida> lista = new ArrayList<>();
+            while (resultado.next()) {
+                lista.add(criarPartidaDoResultSet(resultado));
+            }
+
+            conexao.close();
+            operacao.close();
+            return lista.toArray(new Partida[0]);
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar partidas: " + e.getMessage());
+            return new Partida[0];
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return new Partida[0];
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+            return new Partida[0];
+        }
     }
 
-    static void recuperarTodos(Partida[] array) {
-        DaoPartida.arrayDeElementos = array;
-        for (numElementos = 0; numElementos < array.length; numElementos++)
-            if (array[numElementos] == null)
-                break;
+    private static Partida criarPartidaDoResultSet(ResultSet resultado) throws SQLException {
+        Partida partida = new Partida();
+        partida.setId(resultado.getInt("id"));
+
+        int usuarioId = resultado.getInt("usuario_id");
+        if (usuarioId > 0) {
+            Usuario usuario = new DaoUsuario().obterUsuarioPeloId(usuarioId);
+            partida.setUsuario(usuario);
+        }
+
+        partida.setModo(resultado.getString("modo"));
+        partida.setTempo(resultado.getInt("tempo"));
+        partida.setResultado(resultado.getString("resultado"));
+
+        Date dataSql = resultado.getDate("data_partida");
+        if (dataSql != null) {
+            partida.setDataPartida(dataSql.toString());
+        }
+
+        return partida;
     }
 }

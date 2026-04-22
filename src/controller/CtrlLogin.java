@@ -51,7 +51,6 @@ public class CtrlLogin extends CtrlAbstrato {
 
 	public void encerrar() {
 		this.janela.setVisible(false);
-		// Só chama fimLogin se houver um usuário logado (não foi criado conta nova)
 		if (this.usuarioLogado != null) {
 			CtrlAbstrato ctrlPai = this.getCtrlPai();
 			if (ctrlPai instanceof CtrlPrograma ctrl) {

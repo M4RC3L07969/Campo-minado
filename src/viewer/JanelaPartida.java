@@ -3,6 +3,8 @@ package viewer;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,7 +21,7 @@ public class JanelaPartida extends JanelaAbstrata {
 	private JComboBox<String> cbModo;
 	private JTextField tfTempo;
 	private JComboBox<String> cbResultado;
-	private JTextField tfDataPartida;
+	private JSpinner spinnerDataPartida;
 
 	public JanelaPartida(CtrlAbstrato ctrl) {
 		this(ctrl, null);
@@ -88,10 +90,12 @@ public class JanelaPartida extends JanelaAbstrata {
 		lblDataPartida.setBounds(33, 150, 80, 14);
 		contentPane.add(lblDataPartida);
 
-		tfDataPartida = new JTextField();
-		tfDataPartida.setBounds(120, 145, 200, 20);
-		contentPane.add(tfDataPartida);
-		tfDataPartida.setColumns(10);
+		SpinnerDateModel dateModel = new SpinnerDateModel();
+		spinnerDataPartida = new JSpinner(dateModel);
+		JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(spinnerDataPartida, "yyyy-MM-dd");
+		spinnerDataPartida.setEditor(dateEditor);
+		spinnerDataPartida.setBounds(120, 145, 200, 20);
+		contentPane.add(spinnerDataPartida);
 
 		JButton btOk = new JButton("Ok");
 		btOk.addActionListener(new ActionListener() {
@@ -104,7 +108,10 @@ public class JanelaPartida extends JanelaAbstrata {
 					String modo = (String) cbModo.getSelectedItem();
 					int tempo = Integer.parseInt(tfTempo.getText());
 					String resultado = (String) cbResultado.getSelectedItem();
-					String dataPartida = tfDataPartida.getText();
+
+					Date dataSelecionada = (Date) spinnerDataPartida.getValue();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					String dataPartida = sdf.format(dataSelecionada);
 
 					if (getCtrl() instanceof CtrlIncluirPartida ctrl) {
 						ctrl.incluirPartida(usuario, modo, tempo, resultado, dataPartida);
