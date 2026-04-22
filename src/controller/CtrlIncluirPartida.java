@@ -21,10 +21,8 @@ public class CtrlIncluirPartida extends CtrlAbstrato {
 
 	public void incluirPartida(Usuario usuario, String modo, int tempo, String resultado, String dataPartida) {
 		try {
-			// Extrair apenas a parte numérica do modo (8x8, 12x12, 16x16)
 			String modoSimplificado = modo.substring(modo.indexOf("(") + 1, modo.indexOf(")"));
 
-			// Remover acento do resultado (Vitória -> Vitoria, Derrota -> Derrota)
 			String resultadoSimplificado = resultado.replace("ó", "o");
 
 			this.partidaCriada = new Partida(usuario, modoSimplificado, tempo, resultadoSimplificado, dataPartida);

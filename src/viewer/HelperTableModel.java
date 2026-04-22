@@ -5,21 +5,20 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 public class HelperTableModel {
 	private DefaultTableModel tableModel;
-	private ArrayList<String> listaAtributos = new ArrayList<String>();
+	private ArrayList<String> listaAtributos = new ArrayList<>();
 	private Object[][] tabela;
 
 	public HelperTableModel(Object[] objetos) {
 		if (objetos == null || objetos.length == 0 || objetos[0] == null) {
-			this.listaAtributos = new ArrayList<String>();
+			this.listaAtributos = new ArrayList<>();
 			this.tabela = new Object[0][0];
 			this.tableModel = new DefaultTableModel(this.getTabela(), this.getAtributos());
 			return;
 		}
-		Class classe = objetos[0].getClass();
+		Class<?> classe = objetos[0].getClass();
 		for (Method m : classe.getMethods()) {
 			String nomeMetodo = m.getName();
 			if (nomeMetodo.startsWith("get") && !nomeMetodo.equals("getClass") && !nomeMetodo.contains("Formatado"))
@@ -34,12 +33,10 @@ public class HelperTableModel {
 					String atributo = listaAtributos.get(j);
 					Method get = classe.getMethod("get" + atributo);
 
-					// Tenta usar método formatado se disponível
 					Method getFormatado = null;
 					try {
 						getFormatado = classe.getMethod("get" + atributo + "Formatado");
 					} catch (NoSuchMethodException e) {
-						// Método formatado não existe, usa o padrão
 					}
 
 					Object valor;
