@@ -159,9 +159,10 @@ public class Usuario implements Serializable {
 
 	public static void validarNome(String nome) throws ModelException {
 		if (nome == null || nome.length() == 0)
-			throw new ModelException("O nome do usuário não pode ser nulo!");
+			throw new ModelException("O usuário não pode ser nulo!");
 		if (nome.length() < TAM_MIN_NOME || nome.length() > TAM_MAX_NOME)
-			throw new ModelException("O nome deve ter entre " + TAM_MIN_NOME + " e " + TAM_MAX_NOME + " caracteres!");
+			throw new ModelException(
+					"O usuário deve ter entre " + TAM_MIN_NOME + " e " + TAM_MAX_NOME + " caracteres!");
 	}
 
 	public static void validarSenha(String senha) throws ModelException {
@@ -174,10 +175,10 @@ public class Usuario implements Serializable {
 
 	public static void validarLogin(String login) throws ModelException {
 		if (login == null || login.length() == 0)
-			throw new ModelException("O login não pode ser nulo!");
+			throw new ModelException("O e-mail não pode ser nulo!");
 		if (login.length() < TAM_MIN_LOGIN || login.length() > TAM_MAX_LOGIN)
 			throw new ModelException(
-					"O login deve ter entre " + TAM_MIN_LOGIN + " e " + TAM_MAX_LOGIN + " caracteres!");
+					"O e-mail deve ter entre " + TAM_MIN_LOGIN + " e " + TAM_MAX_LOGIN + " caracteres!");
 	}
 
 	public void incrementarPartida(boolean venceu) {

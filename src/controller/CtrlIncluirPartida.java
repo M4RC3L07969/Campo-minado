@@ -3,6 +3,7 @@ package controller;
 import model.Partida;
 import model.Usuario;
 import model.dao.DaoPartida;
+import model.dao.DaoUsuario;
 import viewer.JanelaPartida;
 
 public class CtrlIncluirPartida extends CtrlAbstrato {
@@ -32,6 +33,35 @@ public class CtrlIncluirPartida extends CtrlAbstrato {
 				this.janela.notificar("Erro ao incluir partida!");
 				return;
 			}
+
+			boolean venceu = resultadoSimplificado.equalsIgnoreCase("Vitoria");
+			usuario.incrementarPartida(venceu);
+
+			if (venceu) {
+				String dificuldade;
+				switch (modoSimplificado) {
+					case "8x8":
+						dificuldade = "facil";
+						break;
+					case "12x12":
+						dificuldade = "medio";
+						break;
+					case "16x16":
+						dificuldade = "dificil";
+						break;
+					default:
+						dificuldade = "facil";
+				}
+				usuario.atualizarMelhorTempo(dificuldade, tempo);
+			}
+
+			DaoUsuario daoUsuario = new DaoUsuario();
+			boolean atualizado = daoUsuario.alterar(usuario);
+			if (!atualizado) {
+				this.janela.notificar("Erro ao atualizar estatísticas do usuário!");
+				return;
+			}
+
 			this.janela.notificar("Partida incluída com sucesso!");
 			this.encerrar();
 

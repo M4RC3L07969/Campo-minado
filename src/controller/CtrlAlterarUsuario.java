@@ -21,12 +21,12 @@ public class CtrlAlterarUsuario extends CtrlAbstrato {
 		try {
 			DaoUsuario dao = new DaoUsuario();
 			Usuario existente = dao.obterUsuarioPeloNome(novoNome);
-			if (existente != null && existente != this.usuarioSelecionado) {
+			if (existente != null && existente.getId() != this.usuarioSelecionado.getId()) {
 				this.janela.notificar("Já existe um usuário com o nome " + novoNome + "!");
 				return;
 			}
 			existente = dao.obterUsuarioPeloLogin(novoLogin);
-			if (existente != null && existente != this.usuarioSelecionado) {
+			if (existente != null && existente.getId() != this.usuarioSelecionado.getId()) {
 				this.janela.notificar("Já existe um usuário com o login " + novoLogin + "!");
 				return;
 			}

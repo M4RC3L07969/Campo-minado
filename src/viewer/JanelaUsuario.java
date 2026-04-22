@@ -11,11 +11,13 @@ import controller.CtrlAbstrato;
 import controller.CtrlIncluirUsuario;
 import controller.CtrlAlterarUsuario;
 import model.Usuario;
+import util.SvgIconUtil;
+import util.JTextFieldEmail;
 
 public class JanelaUsuario extends JanelaAbstrata {
 	private JPanel contentPane;
 	private JTextField tfNome;
-	private JTextField tfLogin;
+	private JTextFieldEmail tfLogin;
 	private JPasswordField pfSenha;
 	private boolean senhaVisivel = false;
 	private boolean modoEdicao = false;
@@ -34,52 +36,55 @@ public class JanelaUsuario extends JanelaAbstrata {
 		this.modoEdicao = modoEdicao;
 		setTitle("Usuário");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 350, 250);
+		setBounds(100, 100, 350, 280);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblNome = new JLabel("Nome:");
+		JLabel lblNome = new JLabel("Usuário:");
 		lblNome.setFont(new Font("Calibri", Font.PLAIN, 14));
 		lblNome.setBounds(33, 30, 60, 14);
 		contentPane.add(lblNome);
 
 		tfNome = new JTextField();
-		tfNome.setBounds(100, 25, 200, 20);
+		tfNome.setBounds(33, 50, 270, 25);
 		contentPane.add(tfNome);
 		tfNome.setColumns(10);
 
-		JLabel lblLogin = new JLabel("Login:");
+		JLabel lblLogin = new JLabel("E-mail:");
 		lblLogin.setFont(new Font("Calibri", Font.PLAIN, 14));
-		lblLogin.setBounds(33, 60, 60, 14);
+		lblLogin.setBounds(33, 90, 60, 14);
 		contentPane.add(lblLogin);
 
-		tfLogin = new JTextField();
-		tfLogin.setBounds(100, 55, 200, 20);
+		tfLogin = new JTextFieldEmail();
+		tfLogin.setBounds(33, 110, 270, 25);
 		contentPane.add(tfLogin);
 		tfLogin.setColumns(10);
 
 		JLabel lblSenha = new JLabel("Senha:");
 		lblSenha.setFont(new Font("Calibri", Font.PLAIN, 14));
-		lblSenha.setBounds(33, 95, 60, 14);
+		lblSenha.setBounds(33, 150, 60, 14);
 		contentPane.add(lblSenha);
 
 		pfSenha = new JPasswordField();
-		pfSenha.setBounds(100, 90, 170, 20);
+		pfSenha.setBounds(33, 170, 240, 25);
 		contentPane.add(pfSenha);
 
-		JButton btOlho = new JButton("👁");
-		btOlho.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
-		btOlho.setBounds(275, 90, 30, 20);
+		JButton btOlho = new JButton();
+		btOlho.setIcon(SvgIconUtil.createEyeOpenIcon(14));
+		btOlho.setBounds(280, 170, 23, 25);
+		btOlho.setContentAreaFilled(false);
+		btOlho.setBorderPainted(false);
+		btOlho.setFocusPainted(false);
 		btOlho.addActionListener(e -> {
 			senhaVisivel = !senhaVisivel;
 			if (senhaVisivel) {
 				pfSenha.setEchoChar((char) 0);
-				btOlho.setText("🙈");
+				btOlho.setIcon(SvgIconUtil.createEyeClosedIcon(14));
 			} else {
 				pfSenha.setEchoChar('•');
-				btOlho.setText("👁");
+				btOlho.setIcon(SvgIconUtil.createEyeOpenIcon(14));
 			}
 		});
 		contentPane.add(btOlho);
@@ -94,8 +99,14 @@ public class JanelaUsuario extends JanelaAbstrata {
 		btOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = tfNome.getText();
-				String login = tfLogin.getText();
+				String login = tfLogin.getRealText();
 				String senha = modoEdicao ? null : new String(pfSenha.getPassword());
+
+				if (!tfLogin.isEmailValid() && !modoEdicao) {
+					JOptionPane.showMessageDialog(btOk,
+							"Por favor, insira um e-mail válido (deve conter texto antes e depois do @).");
+					return;
+				}
 
 				if (getCtrl() instanceof CtrlIncluirUsuario ctrl) {
 					ctrl.incluirUsuario(nome, login, senha);
@@ -106,7 +117,7 @@ public class JanelaUsuario extends JanelaAbstrata {
 				}
 			}
 		});
-		btOk.setBounds(70, 140, 89, 23);
+		btOk.setBounds(33, 215, 130, 30);
 		contentPane.add(btOk);
 
 		JButton btCancelar = new JButton("Cancelar");
@@ -115,7 +126,7 @@ public class JanelaUsuario extends JanelaAbstrata {
 				setVisible(false);
 			}
 		});
-		btCancelar.setBounds(180, 140, 89, 23);
+		btCancelar.setBounds(173, 215, 130, 30);
 		contentPane.add(btCancelar);
 
 		if (nomeInicial != null) {
@@ -123,6 +134,7 @@ public class JanelaUsuario extends JanelaAbstrata {
 		}
 		if (loginInicial != null) {
 			tfLogin.setText(loginInicial);
+			tfLogin.setForeground(tfLogin.originalColor);
 		}
 		if (senhaInicial != null) {
 			pfSenha.setText(senhaInicial);

@@ -1,11 +1,8 @@
 package viewer;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import java.awt.Font;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.CtrlConsultarUsuarios;
@@ -20,7 +17,7 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 		super(ctrl);
 		setTitle("Usuários");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 600, 350);
+		setBounds(100, 100, 650, 400);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -29,10 +26,11 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 		this.atualizarDados(conjUsuarios);
 
 		JScrollPane scrollPane = new JScrollPane(tabela);
-		scrollPane.setBounds(10, 11, 564, 250);
+		scrollPane.setBounds(25, 25, 600, 280);
 		contentPane.add(scrollPane);
 
 		JButton btExcluir = new JButton("Excluir");
+		btExcluir.setFont(new Font("Calibri", Font.PLAIN, 14));
 		btExcluir.addActionListener(e -> {
 			Usuario u = obterLinhaSelecionada();
 			if (u != null) {
@@ -49,10 +47,11 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 				notificar("Selecione um usuário para exclusão");
 			}
 		});
-		btExcluir.setBounds(10, 270, 89, 23);
+		btExcluir.setBounds(25, 320, 130, 35);
 		contentPane.add(btExcluir);
 
 		JButton btAlterar = new JButton("Alterar");
+		btAlterar.setFont(new Font("Calibri", Font.PLAIN, 14));
 		btAlterar.addActionListener(e -> {
 			Usuario u = obterLinhaSelecionada();
 			if (u != null) {
@@ -62,12 +61,13 @@ public class JanelaConsultarUsuarios extends JanelaAbstrata {
 				notificar("Selecione um usuário para alteração");
 			}
 		});
-		btAlterar.setBounds(230, 270, 89, 23);
+		btAlterar.setBounds(165, 320, 130, 35);
 		contentPane.add(btAlterar);
 
 		JButton btSair = new JButton("Sair");
+		btSair.setFont(new Font("Calibri", Font.PLAIN, 14));
 		btSair.addActionListener(e -> getCtrl().encerrar());
-		btSair.setBounds(485, 270, 89, 23);
+		btSair.setBounds(495, 320, 130, 35);
 		contentPane.add(btSair);
 
 		this.setVisible(true);

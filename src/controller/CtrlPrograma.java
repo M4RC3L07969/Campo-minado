@@ -1,5 +1,6 @@
 package controller;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import model.Usuario;
 import viewer.JanelaPrincipal;
 
@@ -54,6 +55,7 @@ public class CtrlPrograma extends CtrlAbstrato {
     }
 
     public static void main(String[] args) {
+        FlatLightLaf.setup();
         new CtrlPrograma();
     }
 }
