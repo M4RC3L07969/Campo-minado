@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import controller.CtrlCampoMinado;
 import model.jogo.CampoMinado;
 import model.jogo.Celula;
+import util.ThemeManager;
 
 public class JanelaJogo extends JanelaAbstrata {
 
@@ -30,12 +31,14 @@ public class JanelaJogo extends JanelaAbstrata {
     private JLabel lblTimer;
     private Timer timerUI;
 
-    private static final Color COR_FECHADA = new Color(189, 189, 189);
-    private static final Color COR_ABERTA = new Color(224, 224, 224);
+    private static final Color COR_FECHADA_LIGHT = new Color(189, 189, 189);
+    private static final Color COR_ABERTA_LIGHT = new Color(224, 224, 224);
+    private static final Color COR_FECHADA_DARK = new Color(60, 60, 60);
+    private static final Color COR_ABERTA_DARK = new Color(100, 100, 100);
     private static final Color COR_BANDEIRA = new Color(255, 193, 7);
     private static final Color COR_BOMBA = new Color(244, 67, 54);
 
-    private static final Color[] CORES_NUMEROS = {
+    private static final Color[] CORES_NUMEROS_LIGHT = {
             null,
             new Color(25, 118, 210),
             new Color(56, 142, 60),
@@ -46,6 +49,30 @@ public class JanelaJogo extends JanelaAbstrata {
             new Color(66, 66, 66),
             new Color(158, 158, 158)
     };
+
+    private static final Color[] CORES_NUMEROS_DARK = {
+            null,
+            new Color(100, 181, 246),
+            new Color(129, 199, 132),
+            new Color(239, 154, 154),
+            new Color(186, 104, 200),
+            new Color(255, 204, 128),
+            new Color(77, 208, 225),
+            new Color(200, 200, 200),
+            new Color(255, 255, 255)
+    };
+
+    private Color getCorFechada() {
+        return ThemeManager.getInstance().isDarkMode() ? COR_FECHADA_DARK : COR_FECHADA_LIGHT;
+    }
+
+    private Color getCorAberta() {
+        return ThemeManager.getInstance().isDarkMode() ? COR_ABERTA_DARK : COR_ABERTA_LIGHT;
+    }
+
+    private Color[] getCorNumeros() {
+        return ThemeManager.getInstance().isDarkMode() ? CORES_NUMEROS_DARK : CORES_NUMEROS_LIGHT;
+    }
 
     public JanelaJogo(CtrlCampoMinado ctrl, CampoMinado jogo) {
         super(ctrl);
@@ -98,7 +125,7 @@ public class JanelaJogo extends JanelaAbstrata {
                 JButton botao = new JButton();
                 botao.setBounds(offsetX + j * 36, offsetY + i * 36, 34, 34);
                 botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
-                botao.setBackground(COR_FECHADA);
+                botao.setBackground(getCorFechada());
                 botao.setFocusPainted(false);
                 botao.setOpaque(true);
                 botao.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -156,7 +183,7 @@ public class JanelaJogo extends JanelaAbstrata {
                 JButton botao = this.botoes[i][j];
 
                 if (celula.isAberta()) {
-                    botao.setBackground(COR_ABERTA);
+                    botao.setBackground(getCorAberta());
                     botao.setEnabled(true);
                     botao.setFocusable(false);
                     botao.setBorder(null);
@@ -174,10 +201,11 @@ public class JanelaJogo extends JanelaAbstrata {
                         int n = celula.getMinasAoRedor();
                         botao.setText(String.valueOf(n));
                         botao.setFont(new Font("Arial", Font.BOLD, 14));
-                        if (n < CORES_NUMEROS.length && CORES_NUMEROS[n] != null) {
-                            botao.setForeground(CORES_NUMEROS[n]);
+                        Color[] cores = getCorNumeros();
+                        if (n < cores.length && cores[n] != null) {
+                            botao.setForeground(cores[n]);
                         } else {
-                            botao.setForeground(Color.BLACK);
+                            botao.setForeground(ThemeManager.getInstance().isDarkMode() ? Color.WHITE : Color.BLACK);
                         }
                     } else {
                         botao.setText("");
@@ -195,13 +223,13 @@ public class JanelaJogo extends JanelaAbstrata {
                     botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
                     botao.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 } else if (celula.isInterrogacao()) {
-                    botao.setBackground(COR_FECHADA);
+                    botao.setBackground(getCorFechada());
                     botao.setText("❓");
                     botao.setForeground(Color.BLACK);
                     botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
                     botao.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 } else {
-                    botao.setBackground(COR_FECHADA);
+                    botao.setBackground(getCorFechada());
                     botao.setText("");
                     botao.setForeground(Color.BLACK);
                     botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));

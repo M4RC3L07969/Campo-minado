@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import controller.CtrlPrograma;
 import model.Usuario;
 import model.jogo.ModoJogo;
+import util.ThemeManager;
 
 public class JanelaPrincipal extends JanelaAbstrata {
 
@@ -34,8 +35,19 @@ public class JanelaPrincipal extends JanelaAbstrata {
 
 		lblUsuarioLogado = new JLabel("Usuário: Não logado");
 		lblUsuarioLogado.setFont(new Font("Calibri", Font.BOLD, 14));
-		lblUsuarioLogado.setBounds(30, 5, 340, 20);
+		lblUsuarioLogado.setBounds(30, 5, 250, 20);
 		contentPane.add(lblUsuarioLogado);
+
+		JButton btToggleTheme = new JButton("🌙");
+		btToggleTheme.setToolTipText("Alternar tema Claro/Escuro");
+		btToggleTheme.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ThemeManager.getInstance().toggleTheme();
+				btToggleTheme.setText(ThemeManager.getInstance().isDarkMode() ? "☀️" : "🌙");
+			}
+		});
+		btToggleTheme.setBounds(300, 3, 50, 25);
+		contentPane.add(btToggleTheme);
 
 		JButton btLogin = new JButton("Login");
 		btLogin.addActionListener(new ActionListener() {
@@ -87,15 +99,6 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		btConsultarUsuarios.setBounds(115, 120, 150, 30);
 		contentPane.add(btConsultarUsuarios);
 
-		JButton btIncluirPartida = new JButton("Incluir Partida");
-		btIncluirPartida.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new controller.CtrlIncluirPartida(getCtrl());
-			}
-		});
-		btIncluirPartida.setBounds(115, 155, 150, 30);
-		contentPane.add(btIncluirPartida);
-
 		JButton btConsultarPartidas = new JButton("Consultar Partidas");
 		btConsultarPartidas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -103,7 +106,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				ctrl.iniciarConsultarPartidas();
 			}
 		});
-		btConsultarPartidas.setBounds(115, 190, 150, 30);
+		btConsultarPartidas.setBounds(115, 155, 150, 30);
 		contentPane.add(btConsultarPartidas);
 
 		JButton btSair = new JButton("Sair");
@@ -112,7 +115,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				getCtrl().encerrar();
 			}
 		});
-		btSair.setBounds(130, 230, 120, 30);
+		btSair.setBounds(130, 195, 120, 30);
 		contentPane.add(btSair);
 	}
 
