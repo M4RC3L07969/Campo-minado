@@ -10,8 +10,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import javax.swing.JOptionPane;
+
 import controller.CtrlPrograma;
 import model.Usuario;
+import model.jogo.ModoJogo;
 
 public class JanelaPrincipal extends JanelaAbstrata {
 
@@ -23,7 +26,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		super(ctrl);
 		setTitle("Super Trunfo - Menu Principal");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 400, 280);
+		setBounds(100, 100, 400, 320);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -53,6 +56,27 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		btSignIn.setBounds(200, 35, 150, 30);
 		contentPane.add(btSignIn);
 
+		JButton btJogar = new JButton("Jogar");
+		btJogar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String[] opcoes = { "Fácil (9x9)", "Médio (16x16)", "Difícil (30x16)" };
+				int escolha = JOptionPane.showOptionDialog(null, "Selecione a dificuldade:", "Campo Minado",
+						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
+				if (escolha == JOptionPane.CLOSED_OPTION)
+					return;
+				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
+				ModoJogo modo = switch (escolha) {
+					case 0 -> ModoJogo.FACIL;
+					case 1 -> ModoJogo.MEDIO;
+					case 2 -> ModoJogo.DIFICIL;
+					default -> ModoJogo.FACIL;
+				};
+				ctrl.iniciarJogo(modo);
+			}
+		});
+		btJogar.setBounds(115, 85, 150, 30);
+		contentPane.add(btJogar);
+
 		JButton btConsultarUsuarios = new JButton("Consultar Usuários");
 		btConsultarUsuarios.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -60,7 +84,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				ctrl.iniciarConsultarUsuarios();
 			}
 		});
-		btConsultarUsuarios.setBounds(115, 85, 150, 30);
+		btConsultarUsuarios.setBounds(115, 120, 150, 30);
 		contentPane.add(btConsultarUsuarios);
 
 		JButton btIncluirPartida = new JButton("Incluir Partida");
@@ -69,7 +93,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				new controller.CtrlIncluirPartida(getCtrl());
 			}
 		});
-		btIncluirPartida.setBounds(115, 120, 150, 30);
+		btIncluirPartida.setBounds(115, 155, 150, 30);
 		contentPane.add(btIncluirPartida);
 
 		JButton btConsultarPartidas = new JButton("Consultar Partidas");
@@ -79,7 +103,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				ctrl.iniciarConsultarPartidas();
 			}
 		});
-		btConsultarPartidas.setBounds(115, 155, 150, 30);
+		btConsultarPartidas.setBounds(115, 190, 150, 30);
 		contentPane.add(btConsultarPartidas);
 
 		JButton btSair = new JButton("Sair");
@@ -88,7 +112,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				getCtrl().encerrar();
 			}
 		});
-		btSair.setBounds(130, 190, 120, 30);
+		btSair.setBounds(130, 230, 120, 30);
 		contentPane.add(btSair);
 	}
 

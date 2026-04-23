@@ -49,6 +49,15 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 			CtrlAbstrato ctrlPai = this.getCtrlPai();
 			if (ctrlPai instanceof CtrlPrograma ctrl) {
 				ctrl.fimLogin(this.usuarioCriado);
+			} else {
+				CtrlAbstrato ctrlAtual = ctrlPai;
+				while (ctrlAtual != null) {
+					if (ctrlAtual instanceof CtrlPrograma ctrl) {
+						ctrl.fimLogin(this.usuarioCriado);
+						break;
+					}
+					ctrlAtual = ctrlAtual.getCtrlPai();
+				}
 			}
 
 			if (this.ctrlLogin != null) {

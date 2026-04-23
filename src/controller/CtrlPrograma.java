@@ -2,12 +2,14 @@ package controller;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import model.Usuario;
+import model.jogo.ModoJogo;
 import viewer.JanelaPrincipal;
 
 public class CtrlPrograma extends CtrlAbstrato {
     private JanelaPrincipal janela;
     private CtrlConsultarPartidas ctrlConsultarPartidas;
     private Usuario usuarioLogado;
+    private CtrlCampoMinado ctrlCampoMinado;
 
     public CtrlPrograma() {
         super(null);
@@ -37,6 +39,10 @@ public class CtrlPrograma extends CtrlAbstrato {
         this.ctrlConsultarPartidas = new CtrlConsultarPartidas(this);
     }
 
+    public void iniciarJogo(ModoJogo modo) {
+        this.ctrlCampoMinado = new CtrlCampoMinado(this, modo);
+    }
+
     public void fimConsultarPartidas() {
         this.ctrlConsultarPartidas = null;
     }
@@ -48,10 +54,18 @@ public class CtrlPrograma extends CtrlAbstrato {
     public void fimLogin(Usuario usuario) {
         this.usuarioLogado = usuario;
         this.janela.atualizarUsuarioLogado(usuario);
+
+        if (this.ctrlCampoMinado != null) {
+            this.ctrlCampoMinado.tentarSalvarPartidaAposLogin();
+        }
     }
 
     public Usuario getUsuarioLogado() {
         return this.usuarioLogado;
+    }
+
+    public void setCtrlCampoMinado(CtrlCampoMinado ctrl) {
+        this.ctrlCampoMinado = ctrl;
     }
 
     public static void main(String[] args) {

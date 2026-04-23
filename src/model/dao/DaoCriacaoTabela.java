@@ -58,7 +58,7 @@ public class DaoCriacaoTabela {
 		String sql = "CREATE TABLE IF NOT EXISTS partida (" +
 				"id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 				"usuario_id INT, " +
-				"modo VARCHAR(5), " +
+				"modo VARCHAR(10), " +
 				"tempo INT, " +
 				"resultado CHAR(7), " +
 				"data_partida DATE, " +
