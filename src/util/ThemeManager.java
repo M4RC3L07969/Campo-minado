@@ -13,7 +13,7 @@ public class ThemeManager {
     private List<JFrame> registeredWindows;
 
     private ThemeManager() {
-        this.isDarkMode = false; // Default: light mode
+        this.isDarkMode = false;
         this.registeredWindows = new ArrayList<>();
     }
 
@@ -56,7 +56,6 @@ public class ThemeManager {
                 UIManager.setLookAndFeel(new FlatLightLaf());
             }
 
-            // Update all registered windows
             for (JFrame window : registeredWindows) {
                 SwingUtilities.updateComponentTreeUI(window);
             }

@@ -100,6 +100,42 @@ public class CampoMinado {
         this.recalcularVizinhos();
     }
 
+    private boolean existeBombaNaAreaInicial(int linha, int coluna) {
+        for (int di = -1; di <= 1; di++) {
+            for (int dj = -1; dj <= 1; dj++) {
+                int ni = linha + di;
+                int nj = coluna + dj;
+                if (posicaoValida(ni, nj) && this.tabuleiro[ni][nj].isTemBomba()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void reposicionarBombasAreaInicial(int linha, int coluna) {
+        for (int di = -1; di <= 1; di++) {
+            for (int dj = -1; dj <= 1; dj++) {
+                int ni = linha + di;
+                int nj = coluna + dj;
+                if (posicaoValida(ni, nj) && this.tabuleiro[ni][nj].isTemBomba()) {
+                    this.tabuleiro[ni][nj].setTemBomba(false);
+                    while (true) {
+                        int novaLinha = this.random.nextInt(this.linhas);
+                        int novaColuna = this.random.nextInt(this.colunas);
+                        if (Math.abs(novaLinha - linha) > 1 || Math.abs(novaColuna - coluna) > 1) {
+                            if (!this.tabuleiro[novaLinha][novaColuna].isTemBomba()) {
+                                this.tabuleiro[novaLinha][novaColuna].setTemBomba(true);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.recalcularVizinhos();
+    }
+
     public void abrirCelula(int linha, int coluna) {
         if (this.jogoEncerrado)
             return;
@@ -113,8 +149,8 @@ public class CampoMinado {
 
         if (this.primeiroClique) {
             this.primeiroClique = false;
-            if (celula.isTemBomba()) {
-                this.reposicionarBomba(linha, coluna);
+            if (existeBombaNaAreaInicial(linha, coluna)) {
+                reposicionarBombasAreaInicial(linha, coluna);
             }
         }
 
@@ -285,6 +321,11 @@ public class CampoMinado {
         return celula.isBandeira() && !celula.isTemBomba();
     }
 
+    public boolean isBandeiraCorreta(int linha, int coluna) {
+        Celula celula = this.tabuleiro[linha][coluna];
+        return celula.isBandeira() && celula.isTemBomba();
+    }
+
     private int contarBandeirasAoRedor(int linha, int coluna) {
         int count = 0;
         for (int di = -1; di <= 1; di++) {
@@ -333,5 +374,23 @@ public class CampoMinado {
                 }
             }
         }
+    }
+
+    public void reset() {
+        this.perdeu = false;
+        this.jogoEncerrado = false;
+        this.minasRestantes = this.quantidadeBombas;
+        this.celulasSegurasRestantes = this.linhas * this.colunas - this.quantidadeBombas;
+        this.primeiroClique = true;
+        this.bombaClicadaDefinida = false;
+
+        for (int i = 0; i < this.linhas; i++) {
+            for (int j = 0; j < this.colunas; j++) {
+                this.tabuleiro[i][j] = new Celula();
+            }
+        }
+
+        this.gerarBombas();
+        this.calcularVizinhos();
     }
 }

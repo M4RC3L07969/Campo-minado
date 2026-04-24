@@ -29,6 +29,7 @@ public class JanelaJogo extends JanelaAbstrata {
     private CampoMinado jogo;
     private JLabel lblMinas;
     private JLabel lblTimer;
+    private JButton btnSmiley;
     private Timer timerUI;
 
     private static final Color COR_FECHADA_LIGHT = new Color(189, 189, 189);
@@ -36,6 +37,7 @@ public class JanelaJogo extends JanelaAbstrata {
     private static final Color COR_FECHADA_DARK = new Color(60, 60, 60);
     private static final Color COR_ABERTA_DARK = new Color(100, 100, 100);
     private static final Color COR_BANDEIRA = new Color(255, 193, 7);
+    private static final Color COR_BANDEIRA_CORRETA = new Color(76, 175, 80);
     private static final Color COR_BOMBA = new Color(244, 67, 54);
 
     private static final Color[] CORES_NUMEROS_LIGHT = {
@@ -104,6 +106,32 @@ public class JanelaJogo extends JanelaAbstrata {
         lblMinas.setFont(new Font("Calibri", Font.BOLD, 16));
         lblMinas.setBounds(10, 5, 120, 25);
         contentPane.add(lblMinas);
+
+        btnSmiley = new JButton("😊");
+        btnSmiley.setFont(new Font("Segoe UI Emoji", Font.BOLD, 20));
+        btnSmiley.setBounds(largura / 2 - 25, 5, 50, 35);
+        btnSmiley.setFocusPainted(false);
+        btnSmiley.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                btnSmiley.setText("😮");
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                CtrlCampoMinado ctrl = (CtrlCampoMinado) getCtrl();
+                ctrl.reiniciarPartida();
+            }
+        });
+        contentPane.add(btnSmiley);
+
+        getRootPane().registerKeyboardAction(
+                e -> {
+                    CtrlCampoMinado ctrlCampo = (CtrlCampoMinado) getCtrl();
+                    ctrlCampo.reiniciarPartida();
+                },
+                javax.swing.KeyStroke.getKeyStroke("F2"),
+                javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         lblTimer = new JLabel("Tempo: 0s");
         lblTimer.setFont(new Font("Calibri", Font.BOLD, 16));
@@ -182,6 +210,9 @@ public class JanelaJogo extends JanelaAbstrata {
                 Celula celula = this.jogo.getCelula(i, j);
                 JButton botao = this.botoes[i][j];
 
+                botao.getModel().setPressed(false);
+                botao.getModel().setArmed(false);
+
                 if (celula.isAberta()) {
                     botao.setBackground(getCorAberta());
                     botao.setEnabled(true);
@@ -213,12 +244,23 @@ public class JanelaJogo extends JanelaAbstrata {
                         botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
                     }
                 } else if (celula.isBandeira()) {
-                    botao.setBackground(COR_BANDEIRA);
+                    if (this.jogo.isJogoEncerrado() && this.jogo.venceu() && this.jogo.isBandeiraCorreta(i, j)) {
+                        botao.setBackground(COR_BANDEIRA_CORRETA);
+                    } else {
+                        botao.setBackground(COR_BANDEIRA);
+                    }
                     if (this.jogo.isJogoEncerrado() && this.jogo.isBandeiraErrada(i, j)) {
                         botao.setText("❌");
                     } else {
                         botao.setText("🚩");
                     }
+                    botao.setForeground(Color.BLACK);
+                    botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+                    botao.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                } else if (this.jogo.isJogoEncerrado() && this.jogo.venceu() && celula.isTemBomba()
+                        && !celula.isBandeira()) {
+                    botao.setBackground(COR_BANDEIRA);
+                    botao.setText("🚩");
                     botao.setForeground(Color.BLACK);
                     botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
                     botao.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -247,13 +289,32 @@ public class JanelaJogo extends JanelaAbstrata {
         this.lblTimer.setText("Tempo: " + tempo + "s");
     }
 
+    public void iniciarTimer() {
+        this.timerUI.start();
+    }
+
+    public void pararTimer() {
+        this.timerUI.stop();
+    }
+
     public void mostrarResultado(boolean venceu, int tempo) {
         this.timerUI.stop();
 
         if (venceu) {
-            notificar("Vitória! Você venceu em " + tempo + " segundos!");
+            atualizarSmiley("😎");
         } else {
-            notificar("Derrota! Você atingiu uma bomba.");
+            atualizarSmiley("😵");
         }
+
+        CtrlCampoMinado ctrl = (CtrlCampoMinado) getCtrl();
+        ctrl.mostrarDialogoResultado(venceu, tempo);
+    }
+
+    public void atualizarSmiley(String emoji) {
+        this.btnSmiley.setText(emoji);
+    }
+
+    public void reiniciarTimer() {
+        this.timerUI.start();
     }
 }

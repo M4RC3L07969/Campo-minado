@@ -1,6 +1,7 @@
 package controller;
 
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 import model.Partida;
 import model.Usuario;
@@ -19,6 +20,7 @@ public class CtrlCampoMinado extends CtrlAbstrato {
     private boolean partidaSalva;
     private Partida partidaCriada;
     private boolean jogoIniciado;
+    private boolean loginEmProgresso;
 
     public CtrlCampoMinado(CtrlAbstrato pai, ModoJogo modo) {
         super(pai);
@@ -27,6 +29,7 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         this.tempoFinal = -1;
         this.partidaSalva = false;
         this.jogoIniciado = false;
+        this.loginEmProgresso = false;
         this.janela = new JanelaJogo(this, this.jogo);
         this.janela.setVisible(true);
     }
@@ -44,7 +47,6 @@ public class CtrlCampoMinado extends CtrlAbstrato {
             if (this.tempoFinal < 0) {
                 this.tempoFinal = (int) ((System.currentTimeMillis() - this.tempoInicio) / 1000);
             }
-            this.salvarPartida();
             this.janela.mostrarResultado(this.jogo.venceu(), this.tempoFinal);
         }
     }
@@ -71,7 +73,6 @@ public class CtrlCampoMinado extends CtrlAbstrato {
             if (this.tempoFinal < 0) {
                 this.tempoFinal = (int) ((System.currentTimeMillis() - this.tempoInicio) / 1000);
             }
-            this.salvarPartida();
             this.janela.mostrarResultado(this.jogo.venceu(), this.tempoFinal);
         }
     }
@@ -90,6 +91,9 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         if (this.partidaSalva)
             return;
 
+        if (this.loginEmProgresso)
+            return;
+
         Usuario usuario = null;
         CtrlAbstrato ctrlPai = this.getCtrlPai();
         if (ctrlPai instanceof CtrlPrograma ctrl) {
@@ -97,24 +101,6 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         }
 
         if (usuario == null) {
-            Object[] options = { "Login", "Não salvar" };
-            int choice = JOptionPane.showOptionDialog(
-                    this.janela,
-                    "Você deseja salvar a partida?",
-                    "Salvar Partida",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    options,
-                    options[0]);
-
-            if (choice == 0) {
-                if (ctrlPai instanceof CtrlPrograma ctrl) {
-                    ctrl.iniciarLogin();
-                }
-            } else {
-                this.partidaSalva = true;
-            }
             return;
         }
 
@@ -170,7 +156,106 @@ public class CtrlCampoMinado extends CtrlAbstrato {
     }
 
     public void tentarSalvarPartidaAposLogin() {
+        this.loginEmProgresso = false;
         salvarPartida();
+        reiniciarPartida();
+    }
+
+    public void reiniciarPartida() {
+        this.jogo.reset();
+        this.tempoInicio = -1;
+        this.tempoFinal = -1;
+        this.partidaSalva = false;
+        this.partidaCriada = null;
+        this.jogoIniciado = false;
+        this.loginEmProgresso = false;
+        this.janela.atualizarTabuleiro();
+        this.janela.atualizarStatus();
+        this.janela.atualizarSmiley("😊");
+        this.janela.iniciarTimer();
+    }
+
+    public void mostrarDialogoResultado(boolean venceu, int tempo) {
+        Usuario usuario = null;
+        CtrlAbstrato ctrlPai = this.getCtrlPai();
+        if (ctrlPai instanceof CtrlPrograma ctrl) {
+            usuario = ctrl.getUsuarioLogado();
+        }
+
+        String titulo = venceu ? "🎉 Vitória!" : "💥 Derrota!";
+        String mensagem = venceu
+                ? "Você venceu em " + tempo + " segundos!"
+                : "Você atingiu uma bomba.";
+
+        if (usuario != null) {
+            salvarPartida();
+
+            String modoDescricao = this.jogo.getModoJogo().getDescricao();
+            int melhorTempo = 0;
+            switch (modoDescricao) {
+                case "9x9":
+                    melhorTempo = usuario.getMelhorTempoFacil();
+                    break;
+                case "16x16":
+                    melhorTempo = usuario.getMelhorTempoMedio();
+                    break;
+                case "30x16":
+                    melhorTempo = usuario.getMelhorTempoDificil();
+                    break;
+            }
+
+            if (tempo == melhorTempo && tempo > 0) {
+                mensagem += "\n\n🏆 Novo recorde!";
+            } else if (melhorTempo > 0) {
+                mensagem += "\n\nSeu melhor tempo: " + melhorTempo + "s";
+            } else {
+                mensagem += "\n\n✔ Tempo salvo no ranking";
+            }
+
+            Object[] options = { "Nova partida", "Menu principal" };
+            int choice = JOptionPane.showOptionDialog(
+                    this.janela,
+                    mensagem,
+                    titulo,
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            if (choice == 0) {
+                reiniciarPartida();
+            } else {
+                encerrar();
+            }
+        } else {
+            Object[] options = { "Entrar para salvar tempo", "Nova partida", "Menu principal" };
+            int choice = JOptionPane.showOptionDialog(
+                    this.janela,
+                    mensagem,
+                    titulo,
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            if (choice == 0) {
+                this.loginEmProgresso = true;
+                CtrlAbstrato finalCtrlPai = ctrlPai;
+                Timer timer = new Timer(100, e -> {
+                    if (finalCtrlPai instanceof CtrlPrograma ctrl) {
+                        ctrl.iniciarLogin();
+                    }
+                });
+                timer.setRepeats(false);
+                timer.start();
+            } else if (choice == 1) {
+                reiniciarPartida();
+            } else {
+                encerrar();
+            }
+        }
     }
 
     @Override
