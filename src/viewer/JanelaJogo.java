@@ -165,16 +165,36 @@ public class JanelaJogo extends JanelaAbstrata {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         CtrlCampoMinado ctrl = (CtrlCampoMinado) getCtrl();
-                        if (jogo.getCelula(linha, coluna).isAberta())
-                            return;
+                        Celula celula = jogo.getCelula(linha, coluna);
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             if (e.isControlDown()) {
                                 ctrl.colocarBandeira(linha, coluna);
+                            } else if (celula.isAberta() && celula.getMinasAoRedor() > 0) {
+                                aplicarEfeitoVizinhos(linha, coluna, true);
+                            } else if (celula.isAberta()) {
+                                ctrl.cliqueDuplo(linha, coluna);
                             } else {
-                                ctrl.abrirCelula(linha, coluna);
+                                botao.getModel().setPressed(true);
+                                botao.getModel().setArmed(true);
                             }
                         } else if (e.getButton() == MouseEvent.BUTTON3) {
                             ctrl.colocarBandeira(linha, coluna);
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        CtrlCampoMinado ctrl = (CtrlCampoMinado) getCtrl();
+                        Celula celula = jogo.getCelula(linha, coluna);
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            if (!e.isControlDown() && celula.isAberta() && celula.getMinasAoRedor() > 0) {
+                                aplicarEfeitoVizinhos(linha, coluna, false);
+                                ctrl.cliqueDuplo(linha, coluna);
+                            } else if (!celula.isAberta()) {
+                                botao.getModel().setPressed(false);
+                                botao.getModel().setArmed(false);
+                                ctrl.abrirCelula(linha, coluna);
+                            }
                         }
                     }
 
@@ -199,6 +219,25 @@ public class JanelaJogo extends JanelaAbstrata {
             }
         });
         this.timerUI.start();
+    }
+
+    private void aplicarEfeitoVizinhos(int linha, int coluna, boolean pressionar) {
+        for (int di = -1; di <= 1; di++) {
+            for (int dj = -1; dj <= 1; dj++) {
+                if (di == 0 && dj == 0)
+                    continue;
+                int ni = linha + di;
+                int nj = coluna + dj;
+                if (ni >= 0 && ni < this.jogo.getLinhas() && nj >= 0 && nj < this.jogo.getColunas()) {
+                    Celula vizinha = this.jogo.getCelula(ni, nj);
+                    JButton btnVizinho = this.botoes[ni][nj];
+                    if (!vizinha.isAberta() && !vizinha.isBandeira()) {
+                        btnVizinho.getModel().setPressed(pressionar);
+                        btnVizinho.getModel().setArmed(pressionar);
+                    }
+                }
+            }
+        }
     }
 
     public void atualizarTabuleiro() {

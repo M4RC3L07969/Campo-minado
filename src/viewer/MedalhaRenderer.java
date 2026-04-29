@@ -80,7 +80,18 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 		setFont(table.getFont());
 		setForeground(table.getForeground());
 
-		int pos = (int) value;
+		int pos = 0;
+		if (value instanceof Integer) {
+			pos = (Integer) value;
+		} else if (value instanceof String) {
+			try {
+				pos = Integer.parseInt((String) value);
+			} catch (NumberFormatException e) {
+				setText("");
+				setIcon(null);
+				return this;
+			}
+		}
 
 		setText("");
 		setIcon(null);
@@ -91,7 +102,7 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 			setIcon(prata);
 		} else if (pos == 3) {
 			setIcon(bronze);
-		} else {
+		} else if (pos > 0) {
 			setText(String.valueOf(pos));
 			setHorizontalAlignment(CENTER);
 		}

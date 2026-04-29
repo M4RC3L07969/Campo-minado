@@ -182,28 +182,43 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                 : "Você atingiu uma bomba.";
 
         if (usuario != null) {
-            salvarPartida();
-
             String modoDescricao = this.jogo.getModoJogo().getDescricao();
-            int melhorTempo = 0;
+            int melhorTempoAnterior = 0;
             switch (modoDescricao) {
                 case "9x9":
-                    melhorTempo = usuario.getMelhorTempoFacil();
+                    melhorTempoAnterior = usuario.getMelhorTempoFacil();
                     break;
                 case "16x16":
-                    melhorTempo = usuario.getMelhorTempoMedio();
+                    melhorTempoAnterior = usuario.getMelhorTempoMedio();
                     break;
                 case "30x16":
-                    melhorTempo = usuario.getMelhorTempoDificil();
+                    melhorTempoAnterior = usuario.getMelhorTempoDificil();
                     break;
             }
 
-            if (tempo == melhorTempo && tempo > 0) {
-                mensagem += "\n\n🏆 Novo recorde!";
-            } else if (melhorTempo > 0) {
-                mensagem += "\n\nSeu melhor tempo: " + melhorTempo + "s";
-            } else {
-                mensagem += "\n\n✔ Tempo salvo no ranking";
+            salvarPartida();
+
+            if (venceu) {
+                int melhorTempoAtual = 0;
+                switch (modoDescricao) {
+                    case "9x9":
+                        melhorTempoAtual = usuario.getMelhorTempoFacil();
+                        break;
+                    case "16x16":
+                        melhorTempoAtual = usuario.getMelhorTempoMedio();
+                        break;
+                    case "30x16":
+                        melhorTempoAtual = usuario.getMelhorTempoDificil();
+                        break;
+                }
+
+                if (melhorTempoAnterior == 0 || tempo < melhorTempoAnterior) {
+                    mensagem += "\n\n🏆 Novo recorde!";
+                } else if (tempo == melhorTempoAnterior) {
+                    mensagem += "\n\nIgualou o seu recorde anterior!! Parabéns";
+                } else {
+                    mensagem += "\n\nSeu melhor tempo: " + melhorTempoAtual + "s";
+                }
             }
 
             Object[] options = { "Nova partida", "Menu principal" };
