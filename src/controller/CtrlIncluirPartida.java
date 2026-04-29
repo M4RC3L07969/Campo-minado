@@ -38,20 +38,7 @@ public class CtrlIncluirPartida extends CtrlAbstrato {
 			usuario.incrementarPartida(venceu);
 
 			if (venceu) {
-				String dificuldade;
-				switch (modoSimplificado) {
-					case "8x8":
-						dificuldade = "facil";
-						break;
-					case "12x12":
-						dificuldade = "medio";
-						break;
-					case "16x16":
-						dificuldade = "dificil";
-						break;
-					default:
-						dificuldade = "facil";
-				}
+				model.jogo.Dificuldade dificuldade = model.jogo.Dificuldade.fromModoDescricao(modoSimplificado);
 				usuario.atualizarMelhorTempo(dificuldade, tempo);
 			}
 
@@ -60,6 +47,11 @@ public class CtrlIncluirPartida extends CtrlAbstrato {
 			if (!atualizado) {
 				this.janela.notificar("Erro ao atualizar estatísticas do usuário!");
 				return;
+			}
+
+			CtrlAbstrato ctrlPai2 = this.getCtrlPai();
+			if (ctrlPai2 instanceof CtrlPrograma ctrl) {
+				ctrl.atualizarRanking();
 			}
 
 			this.janela.notificar("Partida incluída com sucesso!");

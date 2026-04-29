@@ -190,19 +190,19 @@ public class Usuario implements Serializable {
 		}
 	}
 
-	public void atualizarMelhorTempo(String dificuldade, int tempo) {
-		switch (dificuldade.toLowerCase()) {
-			case "facil":
+	public void atualizarMelhorTempo(model.jogo.Dificuldade dificuldade, int tempo) {
+		switch (dificuldade) {
+			case FACIL:
 				if (this.melhorTempoFacil == 0 || tempo < this.melhorTempoFacil) {
 					this.melhorTempoFacil = tempo;
 				}
 				break;
-			case "medio":
+			case MEDIO:
 				if (this.melhorTempoMedio == 0 || tempo < this.melhorTempoMedio) {
 					this.melhorTempoMedio = tempo;
 				}
 				break;
-			case "dificil":
+			case DIFICIL:
 				if (this.melhorTempoDificil == 0 || tempo < this.melhorTempoDificil) {
 					this.melhorTempoDificil = tempo;
 				}

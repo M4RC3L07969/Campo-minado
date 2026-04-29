@@ -46,12 +46,12 @@ public class Partida implements Serializable {
         if (modo == null)
             return "";
         switch (modo) {
-            case "8x8":
-                return "Fácil (8x8)";
-            case "12x12":
-                return "Médio (12x12)";
+            case "9x9":
+                return "Fácil (9x9)";
             case "16x16":
-                return "Difícil (16x16)";
+                return "Médio (16x16)";
+            case "30x16":
+                return "Difícil (30x16)";
             default:
                 return modo;
         }

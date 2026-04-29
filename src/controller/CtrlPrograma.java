@@ -8,6 +8,7 @@ import viewer.JanelaPrincipal;
 public class CtrlPrograma extends CtrlAbstrato {
     private JanelaPrincipal janela;
     private CtrlConsultarPartidas ctrlConsultarPartidas;
+    private CtrlRanking ctrlRanking;
     private Usuario usuarioLogado;
     private CtrlCampoMinado ctrlCampoMinado;
 
@@ -45,6 +46,20 @@ public class CtrlPrograma extends CtrlAbstrato {
 
     public void fimConsultarPartidas() {
         this.ctrlConsultarPartidas = null;
+    }
+
+    public void iniciarRanking() {
+        this.ctrlRanking = new CtrlRanking(this);
+    }
+
+    public void fimRanking() {
+        this.ctrlRanking = null;
+    }
+
+    public void atualizarRanking() {
+        if (this.ctrlRanking != null) {
+            this.ctrlRanking.atualizarDados();
+        }
     }
 
     public CtrlConsultarPartidas getCtrlConsultarPartidas() {

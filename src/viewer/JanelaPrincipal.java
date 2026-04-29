@@ -27,7 +27,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		super(ctrl);
 		setTitle("Super Trunfo - Menu Principal");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 400, 320);
+		setBounds(100, 100, 400, 350);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -109,13 +109,23 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		btConsultarPartidas.setBounds(115, 155, 150, 30);
 		contentPane.add(btConsultarPartidas);
 
+		JButton btRanking = new JButton("Ranking");
+		btRanking.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
+				ctrl.iniciarRanking();
+			}
+		});
+		btRanking.setBounds(115, 190, 150, 30);
+		contentPane.add(btRanking);
+
 		JButton btSair = new JButton("Sair");
 		btSair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getCtrl().encerrar();
 			}
 		});
-		btSair.setBounds(130, 195, 120, 30);
+		btSair.setBounds(130, 225, 120, 30);
 		contentPane.add(btSair);
 	}
 

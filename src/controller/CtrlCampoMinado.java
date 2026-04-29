@@ -94,6 +94,9 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         if (this.loginEmProgresso)
             return;
 
+        if (!this.jogoIniciado || this.tempoFinal < 0)
+            return;
+
         Usuario usuario = null;
         CtrlAbstrato ctrlPai = this.getCtrlPai();
         if (ctrlPai instanceof CtrlPrograma ctrl) {
@@ -123,20 +126,7 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         usuario.incrementarPartida(venceu);
 
         if (venceu) {
-            String dificuldade;
-            switch (modoDescricao) {
-                case "9x9":
-                    dificuldade = "facil";
-                    break;
-                case "16x16":
-                    dificuldade = "medio";
-                    break;
-                case "30x16":
-                    dificuldade = "dificil";
-                    break;
-                default:
-                    dificuldade = "facil";
-            }
+            model.jogo.Dificuldade dificuldade = model.jogo.Dificuldade.fromModoDescricao(modoDescricao);
             usuario.atualizarMelhorTempo(dificuldade, this.tempoFinal);
         }
 
@@ -144,6 +134,10 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         boolean atualizado = daoUsuario.alterar(usuario);
         if (!atualizado) {
             this.janela.notificar("Erro ao atualizar estatísticas do usuário!");
+        }
+
+        if (ctrlPai instanceof CtrlPrograma ctrl) {
+            ctrl.atualizarRanking();
         }
     }
 
