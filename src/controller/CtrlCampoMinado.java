@@ -7,7 +7,9 @@ import model.Partida;
 import model.Usuario;
 import model.dao.DaoPartida;
 import model.dao.DaoUsuario;
+import model.RankingService;
 import model.jogo.CampoMinado;
+import model.jogo.Dificuldade;
 import model.jogo.ModoJogo;
 import viewer.JanelaJogo;
 
@@ -212,8 +214,32 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                         break;
                 }
 
-                if (melhorTempoAnterior == 0 || tempo < melhorTempoAnterior) {
-                    mensagem += "\n\n🏆 Novo recorde!";
+                boolean bateuRecordePessoal = melhorTempoAnterior == 0 || tempo < melhorTempoAnterior;
+
+                if (bateuRecordePessoal) {
+                    Dificuldade dificuldade = Dificuldade.fromModoDescricao(modoDescricao);
+                    RankingService rankingService = new RankingService();
+                    var ranking = rankingService.obterRanking(dificuldade);
+                    int posicaoMundial = -1;
+                    for (int i = 0; i < ranking.size(); i++) {
+                        if (ranking.get(i).getId() == usuario.getId()) {
+                            int tempoRank = rankingService.obterTempo(ranking.get(i), dificuldade);
+                            if (tempoRank == tempo) {
+                                posicaoMundial = i + 1;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (posicaoMundial == 1) {
+                        mensagem += "\n\n🌎🥇 RECORDE MUNDIAL! Você é o melhor do mundo!";
+                    } else if (posicaoMundial > 1 && posicaoMundial <= 3) {
+                        String medalha = posicaoMundial == 2 ? "🥈" : "🥉";
+                        mensagem += "\n\n" + medalha + " TOP 3 MUNDIAL! Você está em " + posicaoMundial
+                                + "º lugar no mundo!";
+                    } else {
+                        mensagem += "\n\n🏆 Novo recorde pessoal!";
+                    }
                 } else if (tempo == melhorTempoAnterior) {
                     mensagem += "\n\nIgualou o seu recorde anterior!! Parabéns";
                 } else {
