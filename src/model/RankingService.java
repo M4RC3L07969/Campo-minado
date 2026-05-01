@@ -1,44 +1,51 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import model.dao.DaoUsuario;
+import model.dao.DaoPartida;
 import model.jogo.Dificuldade;
 
 public class RankingService {
 
     private static final int TOP_N = 10;
 
-    public List<Usuario> obterRanking(Dificuldade dificuldade) {
-        Usuario[] usuarios = DaoUsuario.obterTodos();
-        List<Usuario> lista = new ArrayList<>();
-        for (Usuario u : usuarios) {
-            int tempo = obterTempo(u, dificuldade);
-            if (tempo > 0) {
-                lista.add(u);
-            }
-        }
+    public List<RankingEntry> obterRanking(Dificuldade dificuldade, PeriodoRanking periodo) {
+        String modo = dificuldadeToModo(dificuldade);
+        List<RankingEntry> lista = DaoPartida.obterMelhoresTemposPorPeriodo(modo, periodo);
+
         lista.sort(Comparator
-                .comparingInt((Usuario u) -> obterTempo(u, dificuldade))
-                .thenComparing(Usuario::getNome));
+                .comparingInt(RankingEntry::getMelhorTempo)
+                .thenComparing(e -> e.getUsuario().getNome()));
+
         if (lista.size() > TOP_N) {
-            return new ArrayList<>(lista.subList(0, TOP_N));
+            return lista.subList(0, TOP_N);
         }
         return lista;
     }
 
-    public int obterTempo(Usuario u, Dificuldade dificuldade) {
+    public int obterMelhorTempoUsuario(Usuario usuario, Dificuldade dificuldade, PeriodoRanking periodo) {
+        String modo = dificuldadeToModo(dificuldade);
+        List<RankingEntry> lista = DaoPartida.obterMelhoresTemposPorPeriodo(modo, periodo);
+
+        for (RankingEntry entry : lista) {
+            if (entry.getUsuario().getId() == usuario.getId()) {
+                return entry.getMelhorTempo();
+            }
+        }
+        return 0;
+    }
+
+    private String dificuldadeToModo(Dificuldade dificuldade) {
         switch (dificuldade) {
             case FACIL:
-                return u.getMelhorTempoFacil();
+                return "9x9";
             case MEDIO:
-                return u.getMelhorTempoMedio();
+                return "16x16";
             case DIFICIL:
-                return u.getMelhorTempoDificil();
+                return "30x16";
             default:
-                return 0;
+                return "";
         }
     }
 

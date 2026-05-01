@@ -1,5 +1,6 @@
 package controller;
 
+import model.PeriodoRanking;
 import model.RankingService;
 import model.Usuario;
 import viewer.JanelaRanking;
@@ -34,6 +35,6 @@ public class CtrlRanking extends CtrlAbstrato {
 
 	@Override
 	public Object getBemTangivel() {
-		return rankingService.obterRanking(model.jogo.Dificuldade.FACIL);
+		return rankingService.obterRanking(model.jogo.Dificuldade.FACIL, PeriodoRanking.TOTAL);
 	}
 }

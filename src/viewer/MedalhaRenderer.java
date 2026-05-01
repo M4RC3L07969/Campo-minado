@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import model.RankingEntry;
 import model.Usuario;
 
 public class MedalhaRenderer extends DefaultTableCellRenderer {
@@ -21,10 +22,10 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 	private final ImageIcon prata;
 	private final ImageIcon bronze;
 
-	private final List<Usuario> ranking;
+	private final List<RankingEntry> ranking;
 	private final Usuario usuarioLogado;
 
-	public MedalhaRenderer(List<Usuario> ranking, Usuario usuarioLogado) {
+	public MedalhaRenderer(List<RankingEntry> ranking, Usuario usuarioLogado) {
 		this.ranking = ranking;
 		this.usuarioLogado = usuarioLogado;
 
@@ -107,7 +108,8 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 			setHorizontalAlignment(CENTER);
 		}
 
-		if (usuarioLogado != null && row < ranking.size() && ranking.get(row).getId() == usuarioLogado.getId()) {
+		if (usuarioLogado != null && row < ranking.size()
+				&& ranking.get(row).getUsuario().getId() == usuarioLogado.getId()) {
 			setFont(getFont().deriveFont(Font.BOLD));
 			setForeground(new Color(0, 100, 200));
 		} else if (!isSelected) {

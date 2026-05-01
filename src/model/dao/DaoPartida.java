@@ -12,7 +12,12 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import model.Partida;
+import model.PeriodoRanking;
+import model.RankingEntry;
 import model.Usuario;
 
 public class DaoPartida {
@@ -229,5 +234,72 @@ public class DaoPartida {
         }
 
         return partida;
+    }
+
+    public static List<RankingEntry> obterMelhoresTemposPorPeriodo(String modo, PeriodoRanking periodo) {
+        LocalDate dataInicio = periodo.getDataInicio();
+        String sql = "SELECT p.usuario_id, u.nome, u.login, MIN(p.tempo) as melhor_tempo, COUNT(p.id) as total_partidas "
+                +
+                "FROM partida p JOIN usuario u ON p.usuario_id = u.id " +
+                "WHERE p.modo = ? AND p.resultado = 'Vitoria' ";
+
+        if (dataInicio != null) {
+            sql += "AND p.data_partida >= ? ";
+        }
+
+        sql += "GROUP BY p.usuario_id, u.nome, u.login ORDER BY melhor_tempo ASC LIMIT 10";
+
+        List<RankingEntry> lista = new ArrayList<>();
+
+        try {
+            Connection conexao = getStaticConnection();
+            PreparedStatement operacao = conexao.prepareStatement(sql);
+
+            operacao.setString(1, modo);
+            if (dataInicio != null) {
+                operacao.setDate(2, Date.valueOf(dataInicio));
+            }
+
+            ResultSet resultado = operacao.executeQuery();
+
+            while (resultado.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setId(resultado.getInt("usuario_id"));
+                try {
+                    usuario.setNome(resultado.getString("nome"));
+                    usuario.setLogin(resultado.getString("login"));
+                } catch (Exception e) {
+                }
+                usuario.setSenhaHash("");
+
+                int melhorTempo = resultado.getInt("melhor_tempo");
+                int totalPartidas = resultado.getInt("total_partidas");
+
+                lista.add(new RankingEntry(usuario, melhorTempo, totalPartidas));
+            }
+
+            conexao.close();
+            operacao.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar ranking: " + e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.out.println("Erro: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    private static Connection getStaticConnection() throws SQLException, FileNotFoundException, IOException {
+        Properties props = new Properties();
+        FileInputStream arquivo = new FileInputStream("db.properties");
+        props.load(arquivo);
+
+        String url = props.getProperty("db.url");
+        String usuario = props.getProperty("db.usuario");
+        String senha = props.getProperty("db.senha");
+
+        return DriverManager.getConnection(url, usuario, senha);
     }
 }

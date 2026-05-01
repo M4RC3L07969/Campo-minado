@@ -4,6 +4,8 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import model.Partida;
+import model.PeriodoRanking;
+import model.RankingEntry;
 import model.Usuario;
 import model.dao.DaoPartida;
 import model.dao.DaoUsuario;
@@ -219,11 +221,11 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                 if (bateuRecordePessoal) {
                     Dificuldade dificuldade = Dificuldade.fromModoDescricao(modoDescricao);
                     RankingService rankingService = new RankingService();
-                    var ranking = rankingService.obterRanking(dificuldade);
+                    var ranking = rankingService.obterRanking(dificuldade, PeriodoRanking.TOTAL);
                     int posicaoMundial = -1;
                     for (int i = 0; i < ranking.size(); i++) {
-                        if (ranking.get(i).getId() == usuario.getId()) {
-                            int tempoRank = rankingService.obterTempo(ranking.get(i), dificuldade);
+                        if (ranking.get(i).getUsuario().getId() == usuario.getId()) {
+                            int tempoRank = ranking.get(i).getMelhorTempo();
                             if (tempoRank == tempo) {
                                 posicaoMundial = i + 1;
                                 break;
