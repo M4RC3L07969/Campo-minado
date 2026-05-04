@@ -4,6 +4,7 @@ import model.Usuario;
 import model.jogo.ModoJogo;
 import util.ThemeManager;
 import viewer.JanelaPrincipal;
+import controller.CtrlIncluirUsuario;
 
 public class CtrlPrograma extends CtrlAbstrato {
     private JanelaPrincipal janela;
@@ -30,6 +31,15 @@ public class CtrlPrograma extends CtrlAbstrato {
 
     public void iniciarLogin() {
         new CtrlLogin(this);
+    }
+
+    public void iniciarCadastro() {
+        new CtrlIncluirUsuario(this);
+    }
+
+    public void logout() {
+        this.usuarioLogado = null;
+        this.janela.atualizarUsuarioLogado(null);
     }
 
     public void iniciarConsultarUsuarios() {

@@ -1,13 +1,22 @@
 package viewer;
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import javax.swing.JOptionPane;
@@ -15,6 +24,7 @@ import javax.swing.JOptionPane;
 import controller.CtrlPrograma;
 import model.Usuario;
 import model.jogo.ModoJogo;
+import util.SvgIconUtil;
 import util.ThemeManager;
 
 public class JanelaPrincipal extends JanelaAbstrata {
@@ -22,6 +32,8 @@ public class JanelaPrincipal extends JanelaAbstrata {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JLabel lblUsuarioLogado;
+	private JButton btPerfil;
+	private JPopupMenu popupMenu;
 
 	public JanelaPrincipal(CtrlPrograma ctrl) {
 		super(ctrl);
@@ -33,40 +45,36 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		lblUsuarioLogado = new JLabel("Usuário: Não logado");
-		lblUsuarioLogado.setFont(new Font("Calibri", Font.BOLD, 14));
-		lblUsuarioLogado.setBounds(30, 5, 250, 20);
-		contentPane.add(lblUsuarioLogado);
-
-		JButton btToggleTheme = new JButton("🌙");
-		btToggleTheme.setToolTipText("Alternar tema Claro/Escuro");
-		btToggleTheme.addActionListener(new ActionListener() {
+		btPerfil = new JButton();
+		btPerfil.setIcon(SvgIconUtil.createPerfilIcon(30));
+		btPerfil.setToolTipText("Perfil");
+		btPerfil.setBorderPainted(false);
+		btPerfil.setContentAreaFilled(false);
+		btPerfil.setFocusPainted(false);
+		btPerfil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		btPerfil.putClientProperty("JButton.buttonType", "borderless");
+		btPerfil.setBounds(340, 2, 35, 30);
+		btPerfil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ThemeManager.getInstance().toggleTheme();
-				btToggleTheme.setText(ThemeManager.getInstance().isDarkMode() ? "☀️" : "🌙");
+				reconstruirMenu();
+				popupMenu.show(btPerfil, 0, btPerfil.getHeight());
 			}
 		});
-		btToggleTheme.setBounds(300, 3, 50, 25);
-		contentPane.add(btToggleTheme);
 
-		JButton btLogin = new JButton("Login");
-		btLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
-				ctrl.iniciarLogin();
+		addWindowFocusListener(new WindowFocusListener() {
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+			}
+
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				popupMenu.setVisible(false);
 			}
 		});
-		btLogin.setBounds(30, 35, 150, 30);
-		contentPane.add(btLogin);
+		contentPane.add(btPerfil);
 
-		JButton btSignIn = new JButton("Sign In");
-		btSignIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new controller.CtrlIncluirUsuario(getCtrl());
-			}
-		});
-		btSignIn.setBounds(200, 35, 150, 30);
-		contentPane.add(btSignIn);
+		popupMenu = new JPopupMenu();
+		reconstruirMenu();
 
 		JButton btJogar = new JButton("Jogar");
 		btJogar.addActionListener(new ActionListener() {
@@ -129,11 +137,49 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		contentPane.add(btSair);
 	}
 
-	public void atualizarUsuarioLogado(Usuario usuario) {
+	private void reconstruirMenu() {
+		popupMenu.removeAll();
+		CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
+		Usuario usuario = ctrl.getUsuarioLogado();
+
 		if (usuario == null) {
-			lblUsuarioLogado.setText("Usuário: Não logado");
+			JMenuItem miEntrar = new JMenuItem("Entrar");
+			miEntrar.addActionListener(e -> ctrl.iniciarLogin());
+			popupMenu.add(miEntrar);
+
+			JMenuItem miCriarConta = new JMenuItem("Criar conta");
+			miCriarConta.addActionListener(e -> ctrl.iniciarCadastro());
+			popupMenu.add(miCriarConta);
 		} else {
-			lblUsuarioLogado.setText("Usuário: " + usuario.getNome());
+			JPanel painelNome = new JPanel(new BorderLayout());
+			painelNome.setOpaque(false);
+			JLabel lblNome = new JLabel(usuario.getNome(), SwingConstants.CENTER);
+			lblNome.setFont(lblNome.getFont().deriveFont(Font.BOLD));
+			lblNome.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+			painelNome.add(lblNome, BorderLayout.CENTER);
+			popupMenu.add(painelNome);
+
+			popupMenu.addSeparator();
+
+			JCheckBox checkModoClaro = new JCheckBox("Modo claro");
+			checkModoClaro.setSelected(!ThemeManager.getInstance().isDarkMode());
+			checkModoClaro.putClientProperty("JCheckBox.style", "switch");
+			checkModoClaro.putClientProperty("JComponent.variant", "switch");
+			checkModoClaro.setFocusable(false);
+			checkModoClaro.addActionListener(e -> {
+				ThemeManager.getInstance().toggleTheme();
+			});
+			popupMenu.add(checkModoClaro);
+
+			popupMenu.addSeparator();
+
+			JMenuItem miSair = new JMenuItem("Sair da conta");
+			miSair.addActionListener(e -> ctrl.logout());
+			popupMenu.add(miSair);
 		}
+	}
+
+	public void atualizarUsuarioLogado(Usuario usuario) {
+		reconstruirMenu();
 	}
 }

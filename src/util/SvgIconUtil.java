@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+import java.net.URL;
 
 public class SvgIconUtil {
 
@@ -72,5 +73,25 @@ public class SvgIconUtil {
 
         g2d.dispose();
         return new ImageIcon(img);
+    }
+
+    public static ImageIcon createPerfilIcon(int size) {
+        URL url = SvgIconUtil.class.getResource("/resources/icons/perfil.png");
+        if (url != null) {
+            ImageIcon icon = new ImageIcon(url);
+            Image img = icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+        BufferedImage placeholder = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = placeholder.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.GRAY);
+        g2d.fillOval(0, 0, size, size);
+        g2d.setColor(Color.WHITE);
+        int headSize = size / 4;
+        g2d.fillOval(size / 2 - headSize / 2, size / 4, headSize, headSize);
+        g2d.fillArc(size / 4, size / 2, size / 2, size / 2, 0, 180);
+        g2d.dispose();
+        return new ImageIcon(placeholder);
     }
 }

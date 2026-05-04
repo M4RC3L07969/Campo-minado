@@ -54,7 +54,7 @@ public class JanelaRanking extends JanelaAbstrata {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblTitulo = new JLabel("🏆 Ranking dos Jogadores");
+		JLabel lblTitulo = new JLabel("Ranking dos Jogadores");
 		lblTitulo.setFont(new Font("Calibri", Font.BOLD, 18));
 		lblTitulo.setBounds(140, 5, 250, 25);
 		contentPane.add(lblTitulo);
@@ -128,9 +128,9 @@ public class JanelaRanking extends JanelaAbstrata {
 		long minutosRestantes = duracao.toMinutes();
 
 		if (minutosRestantes <= 0) {
-			lblContagem.setText("🔄 Reiniciando...");
+			lblContagem.setText("Reiniciando...");
 		} else {
-			lblContagem.setText("⏳ " + formatarTempoRestante(duracao));
+			lblContagem.setText("Tempo restante: " + formatarTempoRestante(duracao));
 		}
 	}
 
