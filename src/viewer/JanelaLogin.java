@@ -1,0 +1,106 @@
+package viewer;
+
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+import controller.CtrlAbstrato;
+import controller.CtrlLogin;
+import util.SvgIconUtil;
+
+public class JanelaLogin extends JanelaAbstrata {
+	private JPanel contentPane;
+	private JTextField tfNome;
+	private JPasswordField pfSenha;
+	private boolean senhaVisivel = false;
+
+	public JanelaLogin(CtrlAbstrato ctrl) {
+		super(ctrl);
+		setTitle("Login");
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setBounds(100, 100, 350, 260);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JLabel lblNome = new JLabel("Usuário ou e-mail:");
+		lblNome.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblNome.setBounds(33, 30, 140, 14);
+		contentPane.add(lblNome);
+
+		tfNome = new JTextField();
+		tfNome.setBounds(33, 50, 270, 25);
+		contentPane.add(tfNome);
+		tfNome.setColumns(10);
+
+		JLabel lblSenha = new JLabel("Senha:");
+		lblSenha.setFont(new Font("Calibri", Font.PLAIN, 14));
+		lblSenha.setBounds(33, 90, 60, 14);
+		contentPane.add(lblSenha);
+
+		pfSenha = new JPasswordField();
+		pfSenha.setBounds(33, 110, 240, 25);
+		contentPane.add(pfSenha);
+
+		JButton btOlho = new JButton();
+		btOlho.setIcon(SvgIconUtil.createEyeOpenIcon(14));
+		btOlho.setBounds(280, 110, 23, 25);
+		btOlho.setContentAreaFilled(false);
+		btOlho.setBorderPainted(false);
+		btOlho.setFocusPainted(false);
+		btOlho.addActionListener(e -> {
+			senhaVisivel = !senhaVisivel;
+			if (senhaVisivel) {
+				pfSenha.setEchoChar((char) 0);
+				btOlho.setIcon(SvgIconUtil.createEyeClosedIcon(14));
+			} else {
+				pfSenha.setEchoChar('•');
+				btOlho.setIcon(SvgIconUtil.createEyeOpenIcon(14));
+			}
+		});
+		contentPane.add(btOlho);
+
+		JButton btLogin = new JButton("Login");
+		btLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String nome = tfNome.getText();
+				String senha = new String(pfSenha.getPassword());
+
+				if (getCtrl() instanceof CtrlLogin ctrl) {
+					ctrl.fazerLogin(nome, senha);
+				} else {
+					JOptionPane.showMessageDialog(btLogin, "Controlador inválido.");
+				}
+			}
+		});
+		btLogin.setBounds(33, 155, 130, 30);
+		contentPane.add(btLogin);
+
+		JButton btCriarConta = new JButton("Criar conta");
+		btCriarConta.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String nome = tfNome.getText();
+				String senha = new String(pfSenha.getPassword());
+				if (getCtrl() instanceof CtrlLogin ctrl) {
+					ctrl.criarConta(nome, senha);
+				}
+			}
+		});
+		btCriarConta.setBounds(173, 155, 130, 30);
+		contentPane.add(btCriarConta);
+
+		JButton btCancelar = new JButton("Cancelar");
+		btCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+			}
+		});
+		btCancelar.setBounds(103, 195, 130, 25);
+		contentPane.add(btCancelar);
+
+	}
+}
