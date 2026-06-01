@@ -1,6 +1,7 @@
 package viewer;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
@@ -31,6 +34,15 @@ public class JanelaJogo extends JanelaAbstrata {
     private JLabel lblTimer;
     private JButton btnSmiley;
     private Timer timerUI;
+
+    private static final int PASSO_CELULA = 36;
+    private static final int TAMANHO_CELULA = 34;
+    private static final int MARGEM_TABULEIRO = 10;
+    private static final int ALTURA_CABECALHO = 45;
+    private static final int LARGURA_MINIMA_JANELA = 400;
+    private static final int LARGURA_MAXIMA_VIEWPORT = 620;
+    private static final int ALTURA_MAXIMA_VIEWPORT = 560;
+    private static final int ALTURA_MAXIMA_VIEWPORT_DIFICIL = 500;
 
     private static final Color COR_FECHADA_LIGHT = new Color(189, 189, 189);
     private static final Color COR_ABERTA_LIGHT = new Color(224, 224, 224);
@@ -86,21 +98,31 @@ public class JanelaJogo extends JanelaAbstrata {
         setTitle("Campo Minado - " + jogo.getModoJogo().getDescricao());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        int largura = Math.min(Math.max(colunas * 38 + 20, 400), 800);
-        int altura = Math.min(linhas * 38 + 80, 600);
-        setBounds(100, 100, largura, altura);
+        int tabuleiroLargura = colunas * PASSO_CELULA + MARGEM_TABULEIRO * 2;
+        int tabuleiroAltura = linhas * PASSO_CELULA + MARGEM_TABULEIRO * 2;
+        int viewportLargura = Math.min(tabuleiroLargura, LARGURA_MAXIMA_VIEWPORT);
+        int alturaMaximaViewport = linhas > 16 ? ALTURA_MAXIMA_VIEWPORT_DIFICIL : ALTURA_MAXIMA_VIEWPORT;
+        int viewportAltura = Math.min(tabuleiroAltura, alturaMaximaViewport);
+        boolean precisaScrollVertical = tabuleiroAltura > viewportAltura;
+        boolean precisaScrollHorizontal = tabuleiroLargura > viewportLargura;
+        int espessuraScroll = 16;
+        int larguraScroll = viewportLargura + (precisaScrollVertical ? espessuraScroll : 0) + 2;
+        int alturaScroll = viewportAltura + (precisaScrollHorizontal ? espessuraScroll : 0) + 2;
+        int largura = Math.max(larguraScroll + 20, LARGURA_MINIMA_JANELA);
+        int altura = alturaScroll + ALTURA_CABECALHO + 25;
+
         setResizable(true);
 
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setPreferredSize(new Dimension(largura, altura));
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
         JPanel painelTabuleiro = new JPanel();
         painelTabuleiro.setLayout(null);
-        int tabuleiroLargura = colunas * 36 + 20;
-        int tabuleiroAltura = linhas * 36 + 40;
-        painelTabuleiro.setPreferredSize(new java.awt.Dimension(tabuleiroLargura, tabuleiroAltura));
+        painelTabuleiro.setPreferredSize(new Dimension(tabuleiroLargura, tabuleiroAltura));
+        painelTabuleiro.setBackground(getCorAberta());
 
         lblMinas = new JLabel("Minas: " + jogo.getMinasRestantes());
         lblMinas.setFont(new Font("Calibri", Font.BOLD, 16));
@@ -139,9 +161,14 @@ public class JanelaJogo extends JanelaAbstrata {
         contentPane.add(lblTimer);
 
         JScrollPane scroll = new JScrollPane(painelTabuleiro);
-        scroll.setBounds(5, 35, largura - 15, altura - 45);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
-        scroll.getHorizontalScrollBar().setUnitIncrement(16);
+        scroll.setBounds((largura - larguraScroll) / 2, ALTURA_CABECALHO, larguraScroll, alturaScroll);
+        scroll.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.getViewport().setPreferredSize(new Dimension(viewportLargura, viewportAltura));
+        scroll.getViewport().setBackground(getCorAberta());
+        configurarBarraScroll(scroll.getVerticalScrollBar(), espessuraScroll);
+        configurarBarraScroll(scroll.getHorizontalScrollBar(), espessuraScroll);
         contentPane.add(scroll);
 
         this.botoes = new JButton[linhas][colunas];
@@ -151,7 +178,8 @@ public class JanelaJogo extends JanelaAbstrata {
         for (int i = 0; i < linhas; i++) {
             for (int j = 0; j < colunas; j++) {
                 JButton botao = new JButton();
-                botao.setBounds(offsetX + j * 36, offsetY + i * 36, 34, 34);
+                botao.setBounds(offsetX + j * PASSO_CELULA, offsetY + i * PASSO_CELULA,
+                        TAMANHO_CELULA, TAMANHO_CELULA);
                 botao.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
                 botao.setBackground(getCorFechada());
                 botao.setFocusPainted(false);
@@ -219,6 +247,20 @@ public class JanelaJogo extends JanelaAbstrata {
             }
         });
         this.timerUI.start();
+
+        pack();
+        setLocation(100, 100);
+    }
+
+    private void configurarBarraScroll(JScrollBar barra, int espessura) {
+        barra.setUnitIncrement(PASSO_CELULA);
+        barra.setBlockIncrement(PASSO_CELULA * 5);
+
+        if (barra.getOrientation() == JScrollBar.VERTICAL) {
+            barra.setPreferredSize(new Dimension(espessura, 0));
+        } else {
+            barra.setPreferredSize(new Dimension(0, espessura));
+        }
     }
 
     private void aplicarEfeitoVizinhos(int linha, int coluna, boolean pressionar) {
