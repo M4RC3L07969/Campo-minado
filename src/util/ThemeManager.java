@@ -38,11 +38,6 @@ public class ThemeManager {
         return isDarkMode;
     }
 
-    public void toggleTheme() {
-        isDarkMode = !isDarkMode;
-        applyTheme();
-    }
-
     public void setDarkMode(boolean darkMode) {
         this.isDarkMode = darkMode;
         applyTheme();

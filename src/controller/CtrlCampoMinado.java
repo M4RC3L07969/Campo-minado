@@ -1,15 +1,13 @@
 package controller;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import model.Partida;
-import model.PeriodoRanking;
-import model.RankingEntry;
 import model.Usuario;
 import model.dao.DaoPartida;
 import model.dao.DaoUsuario;
-import model.RankingService;
 import model.jogo.CampoMinado;
 import model.jogo.Dificuldade;
 import model.jogo.ModoJogo;
@@ -91,6 +89,14 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         return (int) ((System.currentTimeMillis() - this.tempoInicio) / 1000);
     }
 
+    private Usuario getUsuarioLogado() {
+        CtrlAbstrato ctrlPai = this.getCtrlPai();
+        if (ctrlPai instanceof CtrlPrograma ctrl) {
+            return ctrl.getUsuarioLogado();
+        }
+        return null;
+    }
+
     public void salvarPartida() {
         if (this.partidaSalva)
             return;
@@ -101,47 +107,55 @@ public class CtrlCampoMinado extends CtrlAbstrato {
         if (!this.jogoIniciado || this.tempoFinal < 0)
             return;
 
-        Usuario usuario = null;
-        CtrlAbstrato ctrlPai = this.getCtrlPai();
-        if (ctrlPai instanceof CtrlPrograma ctrl) {
-            usuario = ctrl.getUsuarioLogado();
-        }
-
-        if (usuario == null) {
+        Usuario usuario = getUsuarioLogado();
+        if (usuario == null)
             return;
-        }
+
+        salvarPartidaEmSegundoPlano(usuario, this.jogo.venceu(), this.jogo.getModoJogo().getDescricao(),
+                this.tempoFinal);
+    }
+
+    private void salvarPartidaEmSegundoPlano(Usuario usuario, boolean venceu, String modoDescricao, int tempo) {
+        if (this.partidaSalva || usuario == null)
+            return;
 
         this.partidaSalva = true;
 
-        boolean venceu = this.jogo.venceu();
-        String resultado = venceu ? "Vitoria" : "Derrota";
-        String modoDescricao = this.jogo.getModoJogo().getDescricao();
+        Thread threadSalvar = new Thread(() -> salvarPartidaRegistrada(usuario, venceu, modoDescricao, tempo),
+                "Salvar partida");
+        threadSalvar.setDaemon(true);
+        threadSalvar.start();
+    }
 
-        this.partidaCriada = new Partida(usuario, modoDescricao, this.tempoFinal, resultado,
+    private void salvarPartidaRegistrada(Usuario usuario, boolean venceu, String modoDescricao, int tempo) {
+        String resultado = venceu ? "Vitoria" : "Derrota";
+        Partida partida = new Partida(usuario, modoDescricao, tempo, resultado,
                 java.time.LocalDate.now().toString());
 
         DaoPartida daoPartida = new DaoPartida();
-        boolean incluido = daoPartida.incluir(this.partidaCriada);
+        boolean incluido = daoPartida.incluir(partida);
         if (!incluido) {
-            this.janela.notificar("Erro ao salvar partida!");
+            SwingUtilities.invokeLater(() -> this.janela.notificar("Erro ao salvar partida!"));
             return;
         }
 
+        this.partidaCriada = partida;
         usuario.incrementarPartida(venceu);
 
         if (venceu) {
-            model.jogo.Dificuldade dificuldade = model.jogo.Dificuldade.fromModoDescricao(modoDescricao);
-            usuario.atualizarMelhorTempo(dificuldade, this.tempoFinal);
+            Dificuldade dificuldade = Dificuldade.fromModoDescricao(modoDescricao);
+            usuario.atualizarMelhorTempo(dificuldade, tempo);
         }
 
         DaoUsuario daoUsuario = new DaoUsuario();
         boolean atualizado = daoUsuario.alterar(usuario);
         if (!atualizado) {
-            this.janela.notificar("Erro ao atualizar estatísticas do usuário!");
+            SwingUtilities.invokeLater(() -> this.janela.notificar("Erro ao atualizar estatisticas do usuario!"));
         }
 
+        CtrlAbstrato ctrlPai = this.getCtrlPai();
         if (ctrlPai instanceof CtrlPrograma ctrl) {
-            ctrl.atualizarRanking();
+            SwingUtilities.invokeLater(ctrl::atualizarRanking);
         }
     }
 
@@ -174,11 +188,8 @@ public class CtrlCampoMinado extends CtrlAbstrato {
     }
 
     public void mostrarDialogoResultado(boolean venceu, int tempo) {
-        Usuario usuario = null;
+        Usuario usuario = getUsuarioLogado();
         CtrlAbstrato ctrlPai = this.getCtrlPai();
-        if (ctrlPai instanceof CtrlPrograma ctrl) {
-            usuario = ctrl.getUsuarioLogado();
-        }
 
         String titulo = venceu ? "🎉 Vitória!" : "💥 Derrota!";
         String mensagem = venceu
@@ -200,8 +211,6 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                     break;
             }
 
-            salvarPartida();
-
             if (venceu) {
                 int melhorTempoAtual = 0;
                 switch (modoDescricao) {
@@ -219,29 +228,7 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                 boolean bateuRecordePessoal = melhorTempoAnterior == 0 || tempo < melhorTempoAnterior;
 
                 if (bateuRecordePessoal) {
-                    Dificuldade dificuldade = Dificuldade.fromModoDescricao(modoDescricao);
-                    RankingService rankingService = new RankingService();
-                    var ranking = rankingService.obterRanking(dificuldade, PeriodoRanking.TOTAL);
-                    int posicaoMundial = -1;
-                    for (int i = 0; i < ranking.size(); i++) {
-                        if (ranking.get(i).getUsuario().getId() == usuario.getId()) {
-                            int tempoRank = ranking.get(i).getMelhorTempo();
-                            if (tempoRank == tempo) {
-                                posicaoMundial = i + 1;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (posicaoMundial == 1) {
-                        mensagem += "\n\n🌎🥇 RECORDE MUNDIAL! Você é o melhor do mundo!";
-                    } else if (posicaoMundial > 1 && posicaoMundial <= 3) {
-                        String medalha = posicaoMundial == 2 ? "🥈" : "🥉";
-                        mensagem += "\n\n" + medalha + " TOP 3 MUNDIAL! Você está em " + posicaoMundial
-                                + "º lugar no mundo!";
-                    } else {
-                        mensagem += "\n\n🏆 Novo recorde pessoal!";
-                    }
+                    mensagem += "\n\n🏆 Novo recorde pessoal!";
                 } else if (tempo == melhorTempoAnterior) {
                     mensagem += "\n\nIgualou o seu recorde anterior!! Parabéns";
                 } else {
@@ -259,6 +246,8 @@ public class CtrlCampoMinado extends CtrlAbstrato {
                     null,
                     options,
                     options[0]);
+
+            salvarPartidaEmSegundoPlano(usuario, venceu, modoDescricao, tempo);
 
             if (choice == 0) {
                 reiniciarPartida();

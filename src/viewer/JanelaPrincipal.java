@@ -10,7 +10,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -31,7 +31,6 @@ public class JanelaPrincipal extends JanelaAbstrata {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JLabel lblUsuarioLogado;
 	private JButton btPerfil;
 	private JPopupMenu popupMenu;
 
@@ -44,6 +43,8 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		popupMenu = new JPopupMenu();
 
 		btPerfil = new JButton();
 		btPerfil.setIcon(SvgIconUtil.createPerfilIcon(30));
@@ -73,7 +74,6 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		});
 		contentPane.add(btPerfil);
 
-		popupMenu = new JPopupMenu();
 		reconstruirMenu();
 
 		JButton btJogar = new JButton("Jogar");
@@ -97,26 +97,6 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		btJogar.setBounds(115, 85, 150, 30);
 		contentPane.add(btJogar);
 
-		JButton btConsultarUsuarios = new JButton("Consultar Usuários");
-		btConsultarUsuarios.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
-				ctrl.iniciarConsultarUsuarios();
-			}
-		});
-		btConsultarUsuarios.setBounds(115, 120, 150, 30);
-		contentPane.add(btConsultarUsuarios);
-
-		JButton btConsultarPartidas = new JButton("Consultar Partidas");
-		btConsultarPartidas.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				CtrlPrograma ctrl = (CtrlPrograma) getCtrl();
-				ctrl.iniciarConsultarPartidas();
-			}
-		});
-		btConsultarPartidas.setBounds(115, 155, 150, 30);
-		contentPane.add(btConsultarPartidas);
-
 		JButton btRanking = new JButton("Ranking");
 		btRanking.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -124,7 +104,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				ctrl.iniciarRanking();
 			}
 		});
-		btRanking.setBounds(115, 190, 150, 30);
+		btRanking.setBounds(115, 120, 150, 30);
 		contentPane.add(btRanking);
 
 		JButton btSair = new JButton("Sair");
@@ -133,7 +113,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 				getCtrl().encerrar();
 			}
 		});
-		btSair.setBounds(130, 225, 120, 30);
+		btSair.setBounds(130, 155, 120, 30);
 		contentPane.add(btSair);
 	}
 
@@ -143,6 +123,10 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		Usuario usuario = ctrl.getUsuarioLogado();
 
 		if (usuario == null) {
+			adicionarOpcaoTema();
+
+			popupMenu.addSeparator();
+
 			JMenuItem miEntrar = new JMenuItem("Entrar");
 			miEntrar.addActionListener(e -> ctrl.iniciarLogin());
 			popupMenu.add(miEntrar);
@@ -161,15 +145,7 @@ public class JanelaPrincipal extends JanelaAbstrata {
 
 			popupMenu.addSeparator();
 
-			JCheckBox checkModoClaro = new JCheckBox("Modo claro");
-			checkModoClaro.setSelected(!ThemeManager.getInstance().isDarkMode());
-			checkModoClaro.putClientProperty("JCheckBox.style", "switch");
-			checkModoClaro.putClientProperty("JComponent.variant", "switch");
-			checkModoClaro.setFocusable(false);
-			checkModoClaro.addActionListener(e -> {
-				ThemeManager.getInstance().toggleTheme();
-			});
-			popupMenu.add(checkModoClaro);
+			adicionarOpcaoTema();
 
 			popupMenu.addSeparator();
 
@@ -179,7 +155,17 @@ public class JanelaPrincipal extends JanelaAbstrata {
 		}
 	}
 
-	public void atualizarUsuarioLogado(Usuario usuario) {
+	private void adicionarOpcaoTema() {
+		JCheckBoxMenuItem miModoClaro = new JCheckBoxMenuItem("Modo claro");
+		miModoClaro.setSelected(!ThemeManager.getInstance().isDarkMode());
+		miModoClaro.addActionListener(e -> {
+			ThemeManager.getInstance().setDarkMode(!miModoClaro.isSelected());
+			reconstruirMenu();
+		});
+		popupMenu.add(miModoClaro);
+	}
+
+	public void atualizarUsuarioLogado() {
 		reconstruirMenu();
 	}
 }

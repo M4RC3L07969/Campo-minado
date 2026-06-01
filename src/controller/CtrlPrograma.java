@@ -4,11 +4,9 @@ import model.Usuario;
 import model.jogo.ModoJogo;
 import util.ThemeManager;
 import viewer.JanelaPrincipal;
-import controller.CtrlIncluirUsuario;
 
 public class CtrlPrograma extends CtrlAbstrato {
     private JanelaPrincipal janela;
-    private CtrlConsultarPartidas ctrlConsultarPartidas;
     private CtrlRanking ctrlRanking;
     private Usuario usuarioLogado;
     private CtrlCampoMinado ctrlCampoMinado;
@@ -39,23 +37,11 @@ public class CtrlPrograma extends CtrlAbstrato {
 
     public void logout() {
         this.usuarioLogado = null;
-        this.janela.atualizarUsuarioLogado(null);
-    }
-
-    public void iniciarConsultarUsuarios() {
-        new CtrlConsultarUsuarios(this);
-    }
-
-    public void iniciarConsultarPartidas() {
-        this.ctrlConsultarPartidas = new CtrlConsultarPartidas(this);
+        this.janela.atualizarUsuarioLogado();
     }
 
     public void iniciarJogo(ModoJogo modo) {
         this.ctrlCampoMinado = new CtrlCampoMinado(this, modo);
-    }
-
-    public void fimConsultarPartidas() {
-        this.ctrlConsultarPartidas = null;
     }
 
     public void iniciarRanking() {
@@ -72,13 +58,9 @@ public class CtrlPrograma extends CtrlAbstrato {
         }
     }
 
-    public CtrlConsultarPartidas getCtrlConsultarPartidas() {
-        return this.ctrlConsultarPartidas;
-    }
-
     public void fimLogin(Usuario usuario) {
         this.usuarioLogado = usuario;
-        this.janela.atualizarUsuarioLogado(usuario);
+        this.janela.atualizarUsuarioLogado();
 
         if (this.ctrlCampoMinado != null) {
             this.ctrlCampoMinado.tentarSalvarPartidaAposLogin();

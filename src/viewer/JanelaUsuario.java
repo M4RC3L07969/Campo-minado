@@ -9,8 +9,6 @@ import javax.swing.border.EmptyBorder;
 
 import controller.CtrlAbstrato;
 import controller.CtrlIncluirUsuario;
-import controller.CtrlAlterarUsuario;
-import model.Usuario;
 import util.SvgIconUtil;
 import util.JTextFieldEmail;
 
@@ -20,20 +18,13 @@ public class JanelaUsuario extends JanelaAbstrata {
 	private JTextFieldEmail tfLogin;
 	private JPasswordField pfSenha;
 	private boolean senhaVisivel = false;
-	private boolean modoEdicao = false;
 
 	public JanelaUsuario(CtrlAbstrato ctrl) {
-		this(ctrl, false, null, null, null);
+		this(ctrl, null, null, null);
 	}
 
-	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao) {
-		this(ctrl, modoEdicao, null, null, null);
-	}
-
-	public JanelaUsuario(CtrlAbstrato ctrl, boolean modoEdicao, String nomeInicial, String loginInicial,
-			String senhaInicial) {
+	public JanelaUsuario(CtrlAbstrato ctrl, String nomeInicial, String loginInicial, String senhaInicial) {
 		super(ctrl);
-		this.modoEdicao = modoEdicao;
 		setTitle("Usuário");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 350, 280);
@@ -89,20 +80,14 @@ public class JanelaUsuario extends JanelaAbstrata {
 		});
 		contentPane.add(btOlho);
 
-		if (modoEdicao) {
-			lblSenha.setVisible(false);
-			pfSenha.setVisible(false);
-			btOlho.setVisible(false);
-		}
-
 		JButton btOk = new JButton("Ok");
 		btOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String nome = tfNome.getText();
 				String login = tfLogin.getRealText();
-				String senha = modoEdicao ? null : new String(pfSenha.getPassword());
+				String senha = new String(pfSenha.getPassword());
 
-				if (!tfLogin.isEmailValid() && !modoEdicao) {
+				if (!tfLogin.isEmailValid()) {
 					JOptionPane.showMessageDialog(btOk,
 							"Por favor, insira um e-mail válido (deve conter texto antes e depois do @).");
 					return;
@@ -110,8 +95,6 @@ public class JanelaUsuario extends JanelaAbstrata {
 
 				if (getCtrl() instanceof CtrlIncluirUsuario ctrl) {
 					ctrl.incluirUsuario(nome, login, senha);
-				} else if (getCtrl() instanceof CtrlAlterarUsuario ctrl) {
-					ctrl.alterarUsuario(nome, login, senha);
 				} else {
 					JOptionPane.showMessageDialog(btOk, "Controlador inválido.");
 				}
@@ -139,11 +122,5 @@ public class JanelaUsuario extends JanelaAbstrata {
 		if (senhaInicial != null) {
 			pfSenha.setText(senhaInicial);
 		}
-	}
-
-	public void preencherCampos(Usuario u) {
-		tfNome.setText(u.getNome());
-		tfLogin.setText(u.getLogin());
-		pfSenha.setText("");
 	}
 }

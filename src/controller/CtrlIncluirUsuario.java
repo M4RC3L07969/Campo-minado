@@ -16,21 +16,14 @@ public class CtrlIncluirUsuario extends CtrlAbstrato {
 
 	public CtrlIncluirUsuario(CtrlAbstrato ctrlPai, String nomeInicial, String senhaInicial) {
 		super(ctrlPai);
-		this.janela = new JanelaUsuario(this, false, nomeInicial, null, senhaInicial);
-		this.janela.setVisible(true);
-	}
-
-	public CtrlIncluirUsuario(CtrlAbstrato ctrlPai, CtrlLogin ctrlLogin) {
-		super(ctrlPai);
-		this.ctrlLogin = ctrlLogin;
-		this.janela = new JanelaUsuario(this, false, null, null, null);
+		this.janela = new JanelaUsuario(this, nomeInicial, null, senhaInicial);
 		this.janela.setVisible(true);
 	}
 
 	public CtrlIncluirUsuario(CtrlAbstrato ctrlPai, CtrlLogin ctrlLogin, String nomeInicial, String senhaInicial) {
 		super(ctrlPai);
 		this.ctrlLogin = ctrlLogin;
-		this.janela = new JanelaUsuario(this, false, nomeInicial, null, senhaInicial);
+		this.janela = new JanelaUsuario(this, nomeInicial, null, senhaInicial);
 		this.janela.setVisible(true);
 	}
 

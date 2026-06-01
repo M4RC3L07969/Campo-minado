@@ -41,10 +41,6 @@ public class CtrlLogin extends CtrlAbstrato {
 		}
 	}
 
-	public void criarConta() {
-		this.criarConta(null, null);
-	}
-
 	public void criarConta(String nome, String senha) {
 		new CtrlIncluirUsuario(this, this, nome, senha);
 	}
