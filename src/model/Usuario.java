@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Usuario implements Serializable {
 
-	final public static int TAM_MIN_NOME = 3;
+	final public static int TAM_MIN_NOME = 2;
 	final public static int TAM_MAX_NOME = 30;
 	final public static int TAM_MIN_SENHA = 4;
 	final public static int TAM_MAX_SENHA = 20;

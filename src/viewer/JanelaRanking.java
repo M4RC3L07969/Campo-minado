@@ -248,10 +248,18 @@ public class JanelaRanking extends JanelaAbstrata {
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 				boolean hasFocus, int row, int column) {
 			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+			c.setFont(table.getFont());
 			if (row < ranking.size() && ranking.get(row).getUsuario().getId() == usuarioLogado.getId()) {
 				c.setFont(c.getFont().deriveFont(Font.BOLD));
-				c.setForeground(new Color(0, 100, 200));
-			} else if (!isSelected) {
+				if (!isSelected) {
+					c.setForeground(new Color(0, 100, 200));
+				} else {
+					c.setForeground(table.getSelectionForeground());
+				}
+			} else if (isSelected) {
+				c.setForeground(table.getSelectionForeground());
+			} else {
 				c.setForeground(table.getForeground());
 			}
 			return c;

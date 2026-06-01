@@ -79,7 +79,11 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 		setFont(table.getFont());
-		setForeground(table.getForeground());
+		if (isSelected) {
+			setForeground(table.getSelectionForeground());
+		} else {
+			setForeground(table.getForeground());
+		}
 
 		int pos = 0;
 		if (value instanceof Integer) {
@@ -111,10 +115,11 @@ public class MedalhaRenderer extends DefaultTableCellRenderer {
 		if (usuarioLogado != null && row < ranking.size()
 				&& ranking.get(row).getUsuario().getId() == usuarioLogado.getId()) {
 			setFont(getFont().deriveFont(Font.BOLD));
-			setForeground(new Color(0, 100, 200));
-		} else if (!isSelected) {
-			setForeground(table.getForeground());
-			setFont(table.getFont());
+			if (!isSelected) {
+				setForeground(new Color(0, 100, 200));
+			} else {
+				setForeground(table.getSelectionForeground());
+			}
 		}
 
 		return this;

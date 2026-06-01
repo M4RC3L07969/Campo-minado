@@ -28,3 +28,6 @@ objetos.dat
 
 # Compiled output
 bin/
+
+# Eclipse workspace metadata
+.metadata/
