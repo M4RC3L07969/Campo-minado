@@ -55,7 +55,8 @@ Baixe os arquivos `.jar` nos links abaixo:
   https://dev.mysql.com/downloads/connector/j/
 
 - FlatLaf  
-  https://www.formdev.com/flatlaf/
+  https://repo1.maven.org/maven2/com/formdev/flatlaf/3.7.1/
+  (encontre e baixe flatlaf-3.7.1.jar)
 
 Depois de baixar, coloque os dois arquivos `.jar` dentro de uma pasta chamada `lib` na raiz do projeto.
 
@@ -69,3 +70,4 @@ Campo-minado/
 ├── src/
 ├── db.properties
 └── ...
+```
